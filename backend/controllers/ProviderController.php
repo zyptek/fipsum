@@ -2,16 +2,16 @@
 
 namespace backend\controllers;
 
-use backend\models\Reqhist;
-use backend\models\ReqhistSearch;
+use backend\models\Provider;
+use backend\models\ProviderSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * ReqhistController implements the CRUD actions for Reqhist model.
+ * ProviderController implements the CRUD actions for Provider model.
  */
-class ReqhistController extends Controller
+class ProviderController extends Controller
 {
     /**
      * @inheritDoc
@@ -32,13 +32,13 @@ class ReqhistController extends Controller
     }
 
     /**
-     * Lists all Reqhist models.
+     * Lists all Provider models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new ReqhistSearch();
+        $searchModel = new ProviderSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -46,28 +46,9 @@ class ReqhistController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
-    /**
-     * Lists all Reqhist models.
-     *
-     * @return string
-     */
-    public function actionMov()
-    {
-        $searchModel = new ReqhistSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-		$dataProvider->setSort([
-	        'defaultOrder' => [
-	            'id' => SORT_ASC, // Orden descendente por 'id'
-	        ],
-	    ]);
-        return $this->render('mov', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
 
     /**
-     * Displays a single Reqhist model.
+     * Displays a single Provider model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -80,13 +61,13 @@ class ReqhistController extends Controller
     }
 
     /**
-     * Creates a new Reqhist model.
+     * Creates a new Provider model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Reqhist();
+        $model = new Provider();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -102,7 +83,7 @@ class ReqhistController extends Controller
     }
 
     /**
-     * Updates an existing Reqhist model.
+     * Updates an existing Provider model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -122,7 +103,7 @@ class ReqhistController extends Controller
     }
 
     /**
-     * Deletes an existing Reqhist model.
+     * Deletes an existing Provider model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -136,15 +117,15 @@ class ReqhistController extends Controller
     }
 
     /**
-     * Finds the Reqhist model based on its primary key value.
+     * Finds the Provider model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Reqhist the loaded model
+     * @return Provider the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Reqhist::findOne(['id' => $id])) !== null) {
+        if (($model = Provider::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

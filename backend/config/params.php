@@ -1,4 +1,11 @@
 <?php
 return [
-    'adminEmail' => 'admin@example.com',
+    'adminEmail' => 'no-reply@shipshape.cl',
+    'encryptionKey' => 'clave-de-encriptacion-segura',
+    'alertTitles' => [
+        'success' => 'Éxito',
+        'info' => 'Información',
+        'danger' => 'Error',
+        'warning' => 'Advertencia',
+    ],
 ];

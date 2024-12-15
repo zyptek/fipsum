@@ -85,7 +85,7 @@ class Reqhist extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|UserQuery
      */
-    public function getIduser()
+    public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'iduser']);
     }
@@ -98,4 +98,11 @@ class Reqhist extends \yii\db\ActiveRecord
     {
         return new ReqhistQuery(get_called_class());
     }
+    
+    # Relacones Custom
+    public function getProfile()
+	{
+	    return $this->hasOne(Profile::class, ['iduser' => 'iduser'])
+	                ->via('user'); // Usamos la relación `user`
+	}
 }

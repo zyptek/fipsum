@@ -7,14 +7,14 @@ use yii\helpers\Html;
 
         <?php $form = \yii\bootstrap4\ActiveForm::begin(['id' => 'login-form']) ?>
 
-        <?= $form->field($model,'username', [
+        <?= $form->field($model,'email', [
             'options' => ['class' => 'form-group has-feedback'],
             'inputTemplate' => '{input}<div class="input-group-append"><div class="input-group-text"><span class="fas fa-user"></span></div></div>',
             'template' => '{beginWrapper}{input}{error}{endWrapper}',
             'wrapperOptions' => ['class' => 'input-group mb-3']
         ])
             ->label(false)
-            ->textInput(['placeholder' => "Usuario"]) ?>
+            ->textInput(['placeholder' => "E-mail"]) ?>
 
         <?= $form->field($model, 'password', [
             'options' => ['class' => 'form-group has-feedback'],

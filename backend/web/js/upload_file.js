@@ -45,4 +45,43 @@ $(document).ready(function() {
         });
         return false;  // Prevenir el envío normal del formulario
     });
+    
+    
+/*
+	$('.delete-button').on('click', function(e) {
+	    e.preventDefault();
+	
+	    if (!confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
+	        return;
+	    }
+	
+	    var button = $(this);
+	    var url = button.data('url'); // Obtiene la URL de eliminación
+	    var container = '#image-gallery-container'; // Contenedor de la galería
+	
+	    $.post(url, function(response) {
+	        if (response.success) {
+	            // Recargar la galería
+	            $.ajax({
+	                url: window.location.href, // Usa la misma URL de la página para recargar
+	                type: 'GET',
+	                success: function(html) {
+	                    var newGallery = $(html).find(container).html(); // Extrae el contenido del contenedor
+	                    $(container).html(newGallery); // Reemplaza el contenido actual
+	                },
+	                error: function() {
+	                    alert('Hubo un error al recargar la galería.');
+	                }
+	            });
+	        } else {
+	            alert(response.message || 'Error al eliminar la imagen.');
+	        }
+	    }).fail(function() {
+	        alert('No se pudo completar la solicitud.');
+	    });
+	});
+*/
+    
+    
+    
 });

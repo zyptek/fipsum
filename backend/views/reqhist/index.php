@@ -10,7 +10,7 @@ use yii\widgets\Pjax;
 /** @var backend\models\ReqhistSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Reqhists';
+$this->title = 'Historial de Movimientos de Requerimiento';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="reqhist-index">
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Reqhist', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Crear Registro', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -31,9 +31,34 @@ $this->params['breadcrumbs'][] = $this->title;
 #            ['class' => 'yii\grid\SerialColumn'],
 
 #            'id',
-            'idreq',
-            'idhisttype',
-            'iduser',
+            [
+            	'attribute' => 'idreq',
+            	'label' => 'Requerimiento',
+            	
+            ],
+            [
+            	'attribute' => 'idhisttype',
+            	'value' => function ($model) {
+                	$result = $model->histtype ? $model->histtype->name : '(No definido)';
+                	return ucwords($result);
+            	},
+            ],
+
+            [
+		        'attribute' => 'profile.name',
+
+		        'value' => function ($model) {
+		            return $model->profile ? $model->profile->name : '(Sin perfil)';
+		        }
+		    ],
+			[
+				'attribute' => 'iduser',
+				'label' => 'Autor',
+				'value' => function(){
+					return 'Fernanda Rozas';
+				},
+			],
+            
             'detail',
             //'created_at',
             [

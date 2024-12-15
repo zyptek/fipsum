@@ -5,7 +5,7 @@
 
 use yii\helpers\Html;
 use backend\assets\AppAsset;
-
+use hail812\adminlte\widgets\LoadingStyle;
 
 
 \hail812\adminlte3\assets\FontAwesomeAsset::register($this);
@@ -30,6 +30,31 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <style>
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(250, 250, 250, 1); /* Fondo semitransparente */
+    z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.overlay i {
+    color: #007bff; /* Cambia el color del icono si lo deseas */
+}
+#preloader i {
+    color: #cccccc; /* Cambia a cualquier color que prefieras */
+}
+#preloader i::before {
+    font-family: "Font Awesome 5 Free"; /* Asegúrate de usar la fuente correcta */
+    content: "\f110"; /* Código del nuevo ícono (en este caso, 'fa-cog') */
+    font-weight: 900; /* Opcional: cambia el grosor del ícono */
+}
+	    </style>
     <?php $this->head() ?>
 	<?php
 	#Registro de AppAsset.php
@@ -42,6 +67,11 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 <?php $this->beginBody() ?>
 
 <div class="wrapper">
+	<?= LoadingStyle::widget([
+    'iconSize' => 'fa-3x', // Opcional: ajusta el tamaño del icono (fa-1x, fa-2x, etc.)
+    'options' => ['id' => 'preloader', 'class' => 'overlay'], // Añade un ID para manipularlo con JavaScript
+]);
+?>
     <!-- Navbar -->
     <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
     <!-- /.navbar -->

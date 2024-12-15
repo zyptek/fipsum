@@ -36,7 +36,9 @@ $this->params['breadcrumbs'][] = $this->title;
             [
 	            'attribute' => 'idbranch',
 	            'value' => function ($model) {
-                	$result = $model->branch ? $model->branch->name : '(No definido)';
+		            $company = $model->company ? $model->company->alias : '(No definido)';
+                	$branch = $model->branch ? $model->branch->name : '(No definido)';
+                	$result = $company . "/" . $branch;
                 	return ucwords($result);
             	},
             ],
@@ -85,7 +87,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	            	$dif = $fechaActual->diff($fechaOriginal);
 	            	$dias = $dif->days;
 					$horas = $dif->h;
-	            	return "$dias día(s) y $horas hora(s)";;
+					if($dias > 0){
+						return "$dias día(s) y $horas hora(s)";
+					}else{
+						return "$horas hora(s)";
+					}
+	            	
             	}
             ],
 #            'idalt',

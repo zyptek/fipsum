@@ -4,12 +4,12 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Reqhist;
+use backend\models\Provider;
 
 /**
- * ReqhistSearch represents the model behind the search form of `backend\models\Reqhist`.
+ * ProviderSearch represents the model behind the search form of `backend\models\Provider`.
  */
-class ReqhistSearch extends Reqhist
+class ProviderSearch extends Provider
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class ReqhistSearch extends Reqhist
     public function rules()
     {
         return [
-            [['id', 'idreq', 'idhisttype', 'iduser'], 'integer'],
-            [['detail', 'created_at'], 'safe'],
+            [['id', 'idregion', 'active'], 'integer'],
+            [['name', 'city', 'address', 'contact', 'email', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -40,11 +40,8 @@ class ReqhistSearch extends Reqhist
      */
     public function search($params)
     {
-        $query = Reqhist::find();
-        
-        #Agregamos profile para realizar las busquedas
-		$query->with(['profile']);
-		
+        $query = Provider::find();
+
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -62,13 +59,17 @@ class ReqhistSearch extends Reqhist
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'idreq' => $this->idreq,
-            'idhisttype' => $this->idhisttype,
-            'iduser' => $this->iduser,
+            'idregion' => $this->idregion,
+            'active' => $this->active,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'detail', $this->detail]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'city', $this->city])
+            ->andFilterWhere(['like', 'address', $this->address])
+            ->andFilterWhere(['like', 'contact', $this->contact])
+            ->andFilterWhere(['like', 'email', $this->email]);
 
         return $dataProvider;
     }

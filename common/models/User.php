@@ -103,7 +103,23 @@ class User extends ActiveRecord implements IdentityInterface
             'status' => self::STATUS_ACTIVE,
         ]);
     }
+    /**
+     * Finds user by password reset token
+     *
+     * @param string $token password reset token
+     * @return static|null
+     */
+    public static function findByTempPasswordResetToken($token)
+    {
+        if (!static::isPasswordResetTokenValid($token)) {
+            return null;
+        }
 
+        return static::findOne([
+            'password_reset_token' => $token,
+            'status' => self::STATUS_INACTIVE,
+        ]);
+    }
     /**
      * Finds user by verification email token
      *
@@ -141,6 +157,11 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->getPrimaryKey();
     }
+	
+	public static function findByEmail($email)
+	{
+	    return static::findOne(['email' => $email]);
+	}
 
     /**
      * {@inheritdoc}
@@ -209,5 +230,22 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+    
+    /**
+     * Creamos entrada en profile
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert/* && $this->status === User::STATUS_ACTIVE*/) {
+            // Crear el perfil automáticamente
+            $profile = new \backend\models\Profile();
+            $profile->iduser = $this->id; // Asignar el ID del usuario
+            if (!$profile->save()) {
+                Yii::error('Error al crear el perfil: ' . json_encode($profile->errors));
+            }
+        }
     }
 }

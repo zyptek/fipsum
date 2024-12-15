@@ -16,3 +16,8 @@
 .pagination .active a{
     text-decoration: none!important;
 }
+.help-block{
+    color:red;
+    font-size: 14px;
+    font-style: italic;
+}

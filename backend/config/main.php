@@ -16,6 +16,9 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'permissionCheck' => [
+            'class' => 'backend\components\PermissionCheck',
+        ],
 	    'phpWord' => [
 	        'class' => 'sasha6806\phpword\PhpWord', // Ruta de la clase
 	    ],
@@ -43,22 +46,20 @@ return [
             'targets' => [
                 [
                     'class' => \yii\log\FileTarget::class,
-                    'levels' => ['error', 'warning'],
+                    'levels' => ['error', 'warning', 'info', 'trace'],
+                    'logVars' => ['_POST', '_GET', '_SESSION', '_SERVER'],
                 ],
             ],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

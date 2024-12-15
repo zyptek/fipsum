@@ -87,13 +87,22 @@ use yii\web\JsExpression;
     
     <?php #= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
    
-	<?= $form->field($model, 'idstatus')->dropDownList(
+	<?php
+    if(Yii::$app->controller->action->id == 'update'){
+        echo $form->field($model, 'idstatus')->dropDownList(
         ArrayHelper::map(\backend\models\Status::find()->all(), 'id', 'name'),
         [
             'prompt' => 'Seleccione...',
-
         ]
-    ) ?>
+        );
+    }else{
+        echo $form->field($model, 'idstatus')->dropDownList(
+            ArrayHelper::map(\backend\models\Status::find()->where(['>', 'id', 11])->all(), 'id', 'name'),
+            [
+                'prompt' => 'Seleccione...',
+            ]
+            );
+    } ?>
 
 
     <?php # = $form->field($model, 'created_at')->textInput() ?>

@@ -30,11 +30,19 @@ class ReqController extends Controller
             [
 	            'access' => [
 					'class' => AccessControl::className(),
+                    'denyCallback' => function ($rule, $action) {
+                        // Redirigir al usuario si no tiene acceso
+                        Yii::$app->session->setFlash('error', 'No tiene permiso para acceder a esta sección.');
+                        return Yii::$app->response->redirect(['site/index']);
+                    },
 					'rules' => [
 						[
-							'actions' => [],//aplica a todas las acciones
+#							'actions' => [],//aplica a todas las acciones
 							'allow' => true,
-							'roles' => ['@'],
+#							'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action) {
+                                return Yii::$app->permissionCheck->checkPermission($this->id, $action->id);
+							}
 						],
 					],
 				],

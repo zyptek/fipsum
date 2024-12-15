@@ -39,7 +39,7 @@ class ImageGalleryWidget extends Widget
     'data-caption' => $image->name,
 ]) .
                     // Botón de eliminar
-                    Html::a('Eliminar', $deleteUrl, [
+                    Html::a('<i class="fas fa-trash"></i>', $deleteUrl, [
                         'class' => 'btn btn-danger btn-sm delete-button',
                         'data-method' => 'post', // Envía el método POST para eliminar
                         'data-confirm' => '¿Estás seguro de que deseas eliminar esta imagen?',
