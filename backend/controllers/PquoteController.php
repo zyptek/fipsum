@@ -2,13 +2,20 @@
 
 namespace backend\controllers;
 
+use Yii;
 use backend\models\Pquote;
+use common\models\User;
+use backend\models\Role;
 use backend\models\PquoteSearch;
+use backend\models\Req;
+use backend\models\Profile;
+use backend\models\Company;
+use backend\models\Squote;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
-
 /**
  * PquoteController implements the CRUD actions for Pquote model.
  */
@@ -41,20 +48,21 @@ class PquoteController extends Controller
     {
         $searchModel = new PquoteSearch();
 #        $dataProvider = $searchModel->search($this->request->queryParams);
-		
-		if ($idreq !== null) {
-	        // Filtrar los datos basados en `idreq`
-	        $dataProvider = new ActiveDataProvider([
-            	'query' => $searchModel->find()->where(['idreq' => $idreq]),
-			]);
+        
+        if ($idreq !== null) {
+            // Filtrar los datos basados en `idreq`
+            $dataProvider = new ActiveDataProvider([
+                'query' => $searchModel->find()->where(['idreq' => $idreq]),
+            ]);
 
-	    } else {
-	        // Mostrar todos los datos si no hay filtro
-	        $dataProvider = $searchModel->search($this->request->queryParams);
-	    }
+        } else {
+            // Mostrar todos los datos si no hay filtro
+            $dataProvider = $searchModel->search($this->request->queryParams);
+        }
 
 
         return $this->render('index', [
+	        'idreq' => $idreq,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -68,8 +76,17 @@ class PquoteController extends Controller
      */
     public function actionView($id)
     {
+	    $model = $this->findModel($id);
+	    $tecnicos = User::find()
+        ->joinWith(['profile.role']) // Relación con profile y role
+        ->where(['role.id' => 5]) // Filtrar por ID del rol "técnico"
+        ->all(); 
+
+	    $req = Req::findOne($model->idreq);
         return $this->render('view', [
-            'model' => $this->findModel($id),
+	        'tec' => $tecnicos,
+	        'req' => $req,
+            'model' => $model,
         ]);
     }
 
@@ -107,7 +124,12 @@ class PquoteController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+	        $squote = new Squote();
+	        $squote->idreq = $model->idreq;
+	        $squote->idpquote = $id;
+	        if($squote->save(false)){
+            	return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -129,6 +151,77 @@ class PquoteController extends Controller
         return $this->redirect(['index']);
     }
 
+
+
+
+
+
+
+	/* Action GENERAR PPRESUPUESTO
+		*/
+		
+	public function actionGen($idreq = null)
+    {
+        if ($idreq === null || $idreq == false) {
+            return $this->redirect(['pquote/index']);
+        }
+#		$idreq = Yii::$app->security->decryptByKey(base64_decode($idreq), Yii::$app->params['encryptionKey']);
+
+		$model = Req::find()->where(['id' => $idreq])->one();
+		
+        $pquotes = Pquote::find()->where(['idreq' => $idreq])->all();
+
+		$idCompany = $model->idcompany;
+		$mc = Company::find()->select("mc")->where(["id" => $model->idcompany])->One();
+        return $this->render('gen', [
+	        'mc' => $mc,
+            'idreq' => $idreq,
+            'pquotes' => $pquotes,
+            'model' => $model,
+        ]);
+    }
+
+/*
+    public function actionGenerateBudget()
+    {
+        $data = Yii::$app->request->post();
+
+        if (!isset($data['Squote']) || empty($data['Squote']['items'])) {
+            throw new NotFoundHttpException('No se recibieron datos válidos para generar el presupuesto.');
+        }
+
+        $squote = Squote::findOne($data['Squote']['id']);
+        if (!$squote) {
+            throw new NotFoundHttpException('No se encontró el modelo Squote.');
+        }
+
+        $squote->items = json_encode($data['Squote']['items']);
+        $squote->save();
+
+        return $this->redirect(['view', 'id' => $squote->id]);
+    }
+*/
+    
+    public function actionTec($id){
+	    
+	    $req = Req::findOne($id);
+	
+	    if ($req === null) {
+	        throw new NotFoundHttpException("La solicitud no existe.");
+	    }
+	
+	    if (Yii::$app->request->isPost) {
+	        $tecId = Yii::$app->request->post('tecId');
+	        $req->tecasigned = $tecId; // Asignar el técnico al modelo Req
+	        if ($req->save(false)) {
+	            Yii::$app->session->setFlash('success', 'Técnico asignado correctamente.');
+	        } else {
+	            Yii::$app->session->setFlash('error', 'No se pudo asignar el técnico.');
+	        }
+	    }
+	    return $this->redirect(['index']);	
+    }
+    
     /**
      * Finds the Pquote model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

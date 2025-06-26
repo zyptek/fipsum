@@ -12,6 +12,14 @@ use Yii;
  * @property int $cost
  * @property string $created_at
  * @property int $idreq
+ * @property int|null $selected
+ * @property string|null $description
+ * @property string|null $activities
+ * @property string|null $valunt
+ * @property string|null $payopt
+ * @property string|null $exedr
+ * @property string|null $exehr
+ * @property string|null $tac
  *
  * @property Provider $idprovider0
  * @property Req $idreq0
@@ -34,8 +42,10 @@ class Pquote extends \yii\db\ActiveRecord
     {
         return [
             [['idprovider', 'idreq'], 'required'],
-            [['idprovider', 'cost', 'idreq'], 'integer'],
+            [['idprovider', 'cost', 'idreq', 'selected'], 'integer'],
             [['created_at'], 'safe'],
+            [['description', 'activities', 'payopt', 'tac'], 'string'],
+            [['valunt', 'exedr', 'exehr'], 'string', 'max' => 100],
             [['idprovider'], 'exist', 'skipOnError' => true, 'targetClass' => Provider::class, 'targetAttribute' => ['idprovider' => 'id']],
             [['idreq'], 'exist', 'skipOnError' => true, 'targetClass' => Req::class, 'targetAttribute' => ['idreq' => 'id']],
         ];
@@ -52,6 +62,14 @@ class Pquote extends \yii\db\ActiveRecord
             'cost' => 'Costo',
             'created_at' => 'Fecha Solicitud',
             'idreq' => 'Requerimiento',
+            'selected' => 'Seleccionado',
+            'description' => 'Descripción',
+            'activities' => 'Actividades',
+            'valunt' => 'Válido Hasta',
+            'payopt' => 'Opciones de Pago',
+            'exedr' => 'Días de Ejecución',
+            'exehr' => 'Horas de Ejecución',
+            'tac' => 'Términos',
         ];
     }
 

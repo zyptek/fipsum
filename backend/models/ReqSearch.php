@@ -11,13 +11,14 @@ use backend\models\Req;
  */
 class ReqSearch extends Req
 {
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor'], 'integer'],
+            [['id', 'estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor',], 'integer'],
             [['idalt', 'inidetail', 'description', 'created_at'], 'safe'],
         ];
     }
@@ -69,7 +70,7 @@ class ReqSearch extends Req
             'created_at' => $this->created_at,
         ]);
 
-        $query->andFilterWhere(['like', 'idalt', $this->idalt])
+        $query->andFilterWhere(['like', 'nst', $this->nst])
             ->andFilterWhere(['like', 'inidetail', $this->inidetail])
             ->andFilterWhere(['like', 'description', $this->description]);
 

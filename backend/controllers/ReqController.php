@@ -14,6 +14,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 /**
  * ReqController implements the CRUD actions for Req model.
@@ -30,19 +32,30 @@ class ReqController extends Controller
             [
 	            'access' => [
 					'class' => AccessControl::className(),
-                    'denyCallback' => function ($rule, $action) {
+/*                     'denyCallback' => function ($rule, $action) {
                         // Redirigir al usuario si no tiene acceso
                         Yii::$app->session->setFlash('error', 'No tiene permiso para acceder a esta sección.');
                         return Yii::$app->response->redirect(['site/index']);
-                    },
+                    }, */
 					'rules' => [
 						[
-#							'actions' => [],//aplica a todas las acciones
+							'actions' => [],//aplica a todas las acciones
+							'allow' => true,
+							'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action) {
+								return true;
+							}
+						],
+						[
+							'actions' => [],//aplica a todas las acciones
 							'allow' => true,
 #							'roles' => ['@'],
                             'matchCallback' => function ($rule, $action) {
-                                return Yii::$app->permissionCheck->checkPermission($this->id, $action->id);
+	                            $actionsAsView = ['getBranches', 'getSolicitor', 'quote', 'exportAr', 'exportAst'];
+	                            $actionToCheck = in_array($action->id, $actionsAsView) ? 'view' : $action->id;
+								return Yii::$app->permissionCheck->checkPermission($this->id, $actionToCheck);
 							}
+
 						],
 					],
 				],
@@ -66,6 +79,8 @@ class ReqController extends Controller
         $searchModel = new ReqSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
+		#$dataProvider->query->andWhere(['!=', 'idstatus', 12]);
+		
 		$dataProvider->setSort([
 	        'defaultOrder' => [
 	            'id' => SORT_DESC, // Orden descendente por 'id'
@@ -85,8 +100,24 @@ class ReqController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
-    {
+    {	
+#	    Yii::info('Id recibido view1: ' . $id, __METHOD__);
+#	    $id = Yii::$app->security->decryptByKey($id, Yii::$app->params['encryptionKey']);
+#	    Yii::info('Id recibido view2: ' . $idx, __METHOD__);
+#	    if ($idx === false) {
+#		    Yii::error('Falló el descifrado de $id: ' . $id, __METHOD__);
+#		}
+		
+		$cotis = Pquote::find()->where(['idreq' => $id])->asArray()->all();
+		
+		$tecnicos = User::find()
+        ->joinWith(['profile.role']) // Relación con profile y role
+        ->where(['role.id' => 5]) // Filtrar por ID del rol "técnico"
+        ->all(); 
+        
         return $this->render('view', [
+	        'pquotes' => $cotis,
+	        'tec' => $tecnicos,
             'model' => $this->findModel($id),
         ]);
     }
@@ -103,8 +134,8 @@ class ReqController extends Controller
 		
 		
         if ($this->request->isPost) {
-	        $model->idkam = 1;
-            if ($model->load($this->request->post()) && $model->save()) {
+	        $model->idkam = Yii::$app->user->id;
+            if ($model->load($this->request->post()) && $model->save(false)) {
 				$reqhistModel->iduser = Yii::$app->user->id;
 				$reqhistModel->idreq = $model->id;
 				$reqhistModel->idhisttype = 1;
@@ -153,8 +184,22 @@ class ReqController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+#        $this->findModel($id)->delete();
+		
+		# TODO Incorporar lógica de anulación
+		$model = $this->findModel($id);
+    
+	    if ($model) {
+	        $model->active = 0; // Marcar como inactivo
+	        $model->idstatus = 12; // Status "Anulado"
+	        if ($model->save(false)) { // Guardar sin validación
+	            Yii::$app->session->setFlash('success', 'El registro ha sido desactivado correctamente.');
+	            return $this->redirect(['index']);
+	        } else {
+	            Yii::$app->session->setFlash('error', 'No se pudo desactivar el registro.');
+	            return false;
+	        }
+	    }
         return $this->redirect(['index']);
     }
     
@@ -197,6 +242,7 @@ class ReqController extends Controller
 		    return $this->redirect(['pquote/index', 'idreq' => $id]);
 	    }else{
 	        return $this->render('quote', [
+		        'pQuotes' => Pquote::find()->where(['idreq' => $id])->asArray()->all(),
 	            'model' => $model,
 	            'providers' => $providers,
 	        ]);
@@ -211,6 +257,10 @@ class ReqController extends Controller
      */
     protected function findModel($id)
     {
+#	    Yii::info('Id recibido1: ' . $id, __METHOD__);
+#	    $id = base64_decode($id);
+#	    $id = Yii::$app->security->decryptByKey($id, Yii::$app->params['encryptionKey']);
+#		    Yii::info('Id recibido: ' . $id, __METHOD__);
         if (($model = Req::findOne(['id' => $id])) !== null) {
             return $model;
         }
@@ -281,5 +331,104 @@ class ReqController extends Controller
             ->on(\yii\web\Response::EVENT_AFTER_SEND, function () use ($tempFile) {
                 unlink($tempFile); // Eliminar el archivo temporal después de enviarlo
             });
+    }
+    
+    public function actionExportAst($id)
+    {
+		$model = $this->findModel($id); // Busca el modelo por ID
+
+        // Ruta del template
+        $templatePath = Yii::getAlias('@backend/templates/template-ast.docx');
+
+        // Verifica si existe el archivo del template
+        if (!file_exists($templatePath)) {
+            throw new NotFoundHttpException('El template no fue encontrado.');
+        }
+
+        // Cargar el template
+        $templateProcessor = new TemplateProcessor($templatePath);
+
+        // Reemplazar las variables del template con datos del modelo
+        $templateProcessor->setValue('no_req',$model->id);
+
+        // Guardar el archivo generado temporalmente
+        $tempFile = tempnam(sys_get_temp_dir(), 'ast') . '.docx';
+        $templateProcessor->saveAs($tempFile);
+
+        // Enviar el archivo al navegador para descarga
+        return Yii::$app->response->sendFile($tempFile, 'ast-' . $model->id . '.docx', ['inline' => false])
+            ->on(\yii\web\Response::EVENT_AFTER_SEND, function () use ($tempFile) {
+                unlink($tempFile); // Eliminar el archivo temporal después de enviarlo
+            });
+    }
+    public function actionExportAr($id)
+    {
+        $model = $this->findModel($id); // Busca el modelo por ID
+
+        // Ruta del template
+        $templatePath = Yii::getAlias('@backend/templates/template-ar.xlsx');
+
+        // Verifica si existe el archivo del template
+        if (!file_exists($templatePath)) {
+            throw new NotFoundHttpException('El template no fue encontrado.');
+        }
+
+        // Cargar el template
+        $spreadsheet = IOFactory::load($templatePath);
+
+        // Obtener la hoja activa
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('L3', $model->id);
+        $sheet->setCellValue('L4', $model->nst);
+        $sheet->setCellValue('L5',date('d-m-Y'));
+        $sheet->mergeCells('K7:M7');
+        $sheet->setCellValue('K7', ucfirst($model->profile->name . " " . $model->profile->lastname));
+        $sheet->mergeCells('K9:M9');
+        $sheet->setCellValue('K9', $model->tos->name);
+        $sheet->mergeCells('E7:G7');
+        $sheet->setCellValue('E7', $model->solicitor->name);
+        $sheet->mergeCells('E8:G8');
+        $sheet->setCellValue('E8', $model->company	->name);
+        $sheet->mergeCells('E9:G9');
+        $sheet->setCellValue('E9', $model->branch->name);
+        $sheet->mergeCells('E10:G10');
+        $sheet->setCellValue('E10', $model->branch->address);
+
+		
+
+		
+#		$sheet->setCellValue('M36',$model->subtotal);
+		
+        // Guardar el archivo generado temporalmente
+        $tempFile = tempnam(sys_get_temp_dir(), 'ar-') . $model->id . '.xlsx';
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFile);
+
+        // Enviar el archivo al navegador para descarga
+        return Yii::$app->response->sendFile($tempFile, 'acta-recepción-' . $model->id . '.xlsx', ['inline' => false])
+            ->on(\yii\web\Response::EVENT_AFTER_SEND, function () use ($tempFile) {
+                unlink($tempFile); // Eliminar el archivo temporal después de enviarlo
+            });
+    }
+    
+    public function actionTec($id){
+	    
+	    $req = Req::findOne($id);
+	
+	    if ($req === null) {
+	        throw new NotFoundHttpException("La solicitud no existe.");
+	    }
+	
+	    if (Yii::$app->request->isPost) {
+	        $tecId = Yii::$app->request->post('tecId');
+	        $req->tecasigned = $tecId; // Asignar el técnico al modelo Req
+	        if ($req->save(false)) {
+	            Yii::$app->session->setFlash('success', 'Técnico asignado correctamente.');
+	        } else {
+	            Yii::$app->session->setFlash('error', 'No se pudo asignar el técnico.');
+	        }
+	    }
+	    return $this->redirect(['index']);	
     }
 }

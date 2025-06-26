@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property string $descrip
  * @property string $created_at
  * @property string $updated_at
  *
@@ -31,9 +32,9 @@ class Module extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'descrip'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 45],
+            [['name', 'descrip'], 'string', 'max' => 45],
         ];
     }
 
@@ -44,9 +45,10 @@ class Module extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'name' => 'Modelo',
+            'descrip' => 'Identificador',
+            'created_at' => 'Creado',
+            'updated_at' => 'Actualizado',
         ];
     }
 
@@ -55,7 +57,7 @@ class Module extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getIdusers()
+    public function getUsers()
     {
         return $this->hasMany(User::class, ['id' => 'iduser'])->viaTable('user_module', ['idmodule' => 'id']);
     }

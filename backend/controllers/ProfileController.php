@@ -6,6 +6,8 @@ use Yii;
 use backend\models\Profile;
 use backend\models\ProfileSearch;
 use backend\models\NewUserForm;
+use backend\models\Module;
+use backend\models\UserModule;
 use common\models\User;
 use yii\widgets\ActiveForm;
 use yii\web\Controller;
@@ -57,6 +59,13 @@ class ProfileController extends Controller
     {
         $searchModel = new ProfileSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+
+        $dataProvider->query
+            ->andWhere(['not', ['idrole' => 20]]);# No mostrar admins
+/*             ->andWhere(['or',
+                ['<', 'my_column', 10],
+                ['>', 'my_column', 20]
+        ]); */
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -145,9 +154,6 @@ class ProfileController extends Controller
         $model = new NewUserForm(); // Modelo del formulario para el e-mail
         $profile = new Profile();
         
-#		$bla = User::find()->where(['password_reset_token' => $token])->one();
-#		Yii::info(print_r($model, true), 'debug');
-        
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
@@ -163,13 +169,13 @@ class ProfileController extends Controller
                 $user->created_at = time();
                 $user->updated_at = time();
                 // Generar contraseña temporal
-		        $tempPassword = Yii::$app->security->generateRandomString(12); // Contraseña temporal segura
+		        $tempPassword = "hola1234"; #Yii::$app->security->generateRandomString(12); // Contraseña temporal segura
 		        $user->setPassword($tempPassword); // Guardar la contraseña temporal
 		        $user->generateAuthKey();
 		        $user->generatePasswordResetToken();
 
                 if (!$user->save()) {
-#                    Yii::$app->session->setFlash('danger', 'Error al crear el usuario.');
+                    Yii::$app->session->setFlash('danger', 'Error al crear el usuario.');
                     throw new \Exception('Error al guardar el usuario: ' . json_encode($user->errors));
                 }
                 
@@ -177,7 +183,7 @@ class ProfileController extends Controller
 				$profile->idrole = $model->idrole;
 				
 				if (!$profile->save()) {
-#                    Yii::$app->session->setFlash('danger', 'Error al crear el perfil.');
+                    Yii::$app->session->setFlash('danger', 'Error al crear el perfil.');
                     throw new \Exception('Error al crear el perfil: ' . json_encode($user->errors));
                 }
 
@@ -189,6 +195,7 @@ class ProfileController extends Controller
 #					'temp' => $tempPassword,
 		        ]);
 		        
+/*
 		        $sent = Yii::$app
 		            ->mailer
 		            ->compose(
@@ -199,11 +206,14 @@ class ProfileController extends Controller
 		            ->setTo($user->email)
 		            ->setSubject('Valide su cuenta y active su contraseña.')
 		            ->send();
+*/
 		            
+/*
                 if (!$sent) {
-#                    Yii::$app->session->setFlash('danger', 'Error al enviar el e-mail de validación.');
+                    Yii::$app->session->setFlash('danger', 'Error al enviar el e-mail de validación.');
                     throw new \Exception('Error al enviar el correo de validación.');
                 }
+*/
 
                 $transaction->commit();
                 Yii::$app->session->setFlash('success', 'Se ha enviado un correo de validación al nuevo usuario.');
@@ -224,14 +234,14 @@ class ProfileController extends Controller
     
     public function actionUpdatePermissions($id)
     {
-        $user = \common\models\User::findOne($id);
+        $user = User::findOne($id);
         if (!$user) {
             throw new \yii\web\NotFoundHttpException('El usuario no existe.');
         }
 
         if (Yii::$app->request->isPost) {
             $permissions = Yii::$app->request->post('permissions', []);
-            \backend\models\UserModule::updateUserPermissions($id, $permissions);
+            UserModule::updateUserPermissions($id, $permissions);
 
             Yii::$app->session->setFlash('success', 'Permisos actualizados correctamente.');
             return $this->redirect(['profile/view', 'id' => $id]);
@@ -240,19 +250,19 @@ class ProfileController extends Controller
         Yii::$app->session->setFlash('error', 'Error al actualizar los permisos.');
         return $this->redirect(['profile/view', 'id' => $id]);
     }
-    public function actionPermissions($id)
+    public function actionAccess($id)
     {
         // Buscar el usuario por su ID
-        $user = \common\models\User::findOne($id);
+        $user = User::findOne($id);
         if (!$user) {
             throw new \yii\web\NotFoundHttpException('Usuario no encontrado.');
         }
-
+        $profile = Profile::find()->where(['iduser' => $id])->one();
         // Obtener todos los módulos
-        $modules = \backend\models\Module::find()->asArray()->all();
+        $modules = Module::find()->asArray()->all();
 
         // Obtener permisos actuales del usuario
-        $userModules = \backend\models\UserModule::find()
+        $userModules = UserModule::find()
             ->where(['iduser' => $id])
             ->indexBy('idmodule')
             ->asArray()
@@ -261,13 +271,13 @@ class ProfileController extends Controller
         // Procesar el formulario si se envió
         if (Yii::$app->request->isPost) {
             $permissions = Yii::$app->request->post('permissions', []);
-            \backend\models\UserModule::updateUserPermissions($id, $permissions);
+            UserModule::updateUserPermissions($id, $permissions);
 
             // Mensaje de éxito
             Yii::$app->session->setFlash('success', 'Permisos actualizados correctamente.');
 
             // Recargar permisos actualizados
-            $userModules = \backend\models\UserModule::find()
+            $userModules = UserModule::find()
                 ->where(['iduser' => $id])
                 ->indexBy('idmodule')
                 ->asArray()
@@ -275,10 +285,11 @@ class ProfileController extends Controller
         }
 
         // Renderizar la vista
-        return $this->render('permissions', [
+        return $this->render('access', [
             'user' => $user,
             'modules' => $modules,
             'userModules' => $userModules,
+            'profile' => $profile,
         ]);
     }
 

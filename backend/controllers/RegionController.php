@@ -7,6 +7,7 @@ use backend\models\RegionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * RegionController implements the CRUD actions for Region model.

@@ -12,6 +12,7 @@ use Yii;
  * @property string $alias
  * @property int $idregion
  * @property int $branches
+ * @property int $mc
  * @property int $active
  *
  * @property Branch[] $branches0
@@ -36,7 +37,7 @@ class Company extends \yii\db\ActiveRecord
     {
         return [
             [['alias', 'branches'], 'required'],
-            [['idregion', 'branches', 'active'], 'integer'],
+            [['idregion', 'branches', 'mc', 'active'], 'integer'],
             [['name'], 'string', 'max' => 200],
             [['alias'], 'string', 'max' => 10],
             [['idregion'], 'exist', 'skipOnError' => true, 'targetClass' => Region::class, 'targetAttribute' => ['idregion' => 'id']],
@@ -54,7 +55,8 @@ class Company extends \yii\db\ActiveRecord
             'alias' => 'Alias',
             'idregion' => 'Region',
             'branches' => 'Sucursales',
-            'active' => 'Activa',
+            'mc' => 'MC',
+            'active' => 'Active',
         ];
     }
 

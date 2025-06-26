@@ -46,7 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
 		        'attribute' => 'profile.name',
-
 		        'value' => function ($model) {
 		            return $model->profile ? $model->profile->name : '(Sin perfil)';
 		        }

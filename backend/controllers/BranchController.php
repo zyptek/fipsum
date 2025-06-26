@@ -7,6 +7,7 @@ use backend\models\BranchSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * BranchController implements the CRUD actions for Branch model.
@@ -21,6 +22,16 @@ class BranchController extends BaseController
         return array_merge(
             parent::behaviors(),
             [
+	            'access' => [
+					'class' => AccessControl::className(),
+					'rules' => [
+						[
+							'actions' => [],//aplica a todas las acciones
+							'allow' => true,
+							'roles' => ['@'],
+						],
+					],
+				],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [

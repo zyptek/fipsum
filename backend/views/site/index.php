@@ -1,4 +1,5 @@
 <?php
+
 $this->title = 'Dashboard';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 
@@ -6,6 +7,8 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6">
+            <?php
+            ?>
             <?= \backend\components\CustomAlert::widget([
                 'type' => 'success',
                 'body' => '<h3>Congratulations!</h3>',

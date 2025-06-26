@@ -7,6 +7,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use backend\models\Profile;
 
 /**
  * User model
@@ -248,4 +249,13 @@ class User extends ActiveRecord implements IdentityInterface
             }
         }
     }
+    public function getRole()
+	{
+	    return $this->hasOne(Role::class, ['id' => 'idrole'])
+	    	->via('profile');
+	}
+	public function getProfile()
+	{
+		return $this->hasOne(Profile::class, ['iduser' => 'id']);
+	}
 }

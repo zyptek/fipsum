@@ -37,6 +37,7 @@ class PermissionCheck extends Component
         // Mapear las acciones a los permisos
         $actionToPermission = [
             'create' => 'create',
+            'quote' => 'read',
             'view'   => 'read',
             'index'  => 'read',
             'update' => 'update',
@@ -76,7 +77,7 @@ class PermissionCheck extends Component
     {
         $profile = Profile::find()->where(['iduser' => $userId])->one();
 
-        return $profile && $profile->idrole == 8;
+        return $profile && $profile->idrole > 11;
     }
 
     /**

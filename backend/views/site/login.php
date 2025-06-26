@@ -1,5 +1,16 @@
 <?php
 use yii\helpers\Html;
+use backend\components\CustomAlert as Alert;
+
+foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+    if (in_array($type, ['success', 'info', 'danger', 'warning'], true)) {
+        echo Alert::widget([
+            'type' => $type,
+            'body' => $message,
+        ]);
+    }
+}
+
 ?>
 <div class="card">
     <div class="card-body login-card-body">

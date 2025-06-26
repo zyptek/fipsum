@@ -9,14 +9,25 @@ use Yii;
  *
  * @property int $id
  * @property string $name
- * @property int $idregion
+ * @property string|null $altname
+ * @property string|null $rut
+ * @property string|null $giro
+ * @property int|null $idregion
  * @property string $city
+ * @property int|null $idcity
  * @property string $address
  * @property string $contact
+ * @property string|null $phone
  * @property string $email
  * @property int $active
  * @property string $created_at
  * @property string $updated_at
+ * @property int $margin
+ *
+ * @property City $idcity0
+ * @property Region $idregion0
+ * @property Ocomp[] $ocomps
+ * @property Pquote[] $pquotes
  */
 class Provider extends \yii\db\ActiveRecord
 {
@@ -34,11 +45,15 @@ class Provider extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'idregion', 'city', 'address', 'contact', 'email', 'active'], 'required'],
-            [['idregion', 'active'], 'integer'],
+            [['name', 'city', 'address', 'contact', 'email'], 'required'],
+            [['idregion', 'idcity', 'active', 'margin'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'city', 'address'], 'string', 'max' => 45],
-            [['contact', 'email'], 'string', 'max' => 100],
+            [['name', 'altname', 'city', 'address'], 'string', 'max' => 45],
+            [['rut'], 'string', 'max' => 12],
+            [['giro', 'contact', 'email'], 'string', 'max' => 100],
+            [['phone'], 'string', 'max' => 11],
+            [['idcity'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['idcity' => 'id']],
+            [['idregion'], 'exist', 'skipOnError' => true, 'targetClass' => Region::class, 'targetAttribute' => ['idregion' => 'id']],
         ];
     }
 
@@ -50,15 +65,61 @@ class Provider extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'altname' => 'Altname',
+            'rut' => 'Rut',
+            'giro' => 'Giro',
             'idregion' => 'Idregion',
             'city' => 'City',
+            'idcity' => 'Idcity',
             'address' => 'Address',
             'contact' => 'Contact',
+            'phone' => 'Phone',
             'email' => 'Email',
             'active' => 'Active',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'margin' => 'Margin',
         ];
+    }
+
+    /**
+     * Gets query for [[Idcity0]].
+     *
+     * @return \yii\db\ActiveQuery|CityQuery
+     */
+    public function getIdcity0()
+    {
+        return $this->hasOne(City::class, ['id' => 'idcity']);
+    }
+
+    /**
+     * Gets query for [[Idregion0]].
+     *
+     * @return \yii\db\ActiveQuery|RegionQuery
+     */
+    public function getIdregion0()
+    {
+        return $this->hasOne(Region::class, ['id' => 'idregion']);
+    }
+
+    /**
+     * Gets query for [[Ocomps]].
+     *
+     * @return \yii\db\ActiveQuery|OcompQuery
+     */
+    public function getOcomps()
+    {
+        return $this->hasMany(Ocomp::class, ['idprovider' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Pquotes]].
+     *
+     * @return \yii\db\ActiveQuery|PquoteQuery
+     */
+    public function getPquotes()
+    {
+        return $this->hasMany(Pquote::class, ['idprovider' => 'id']);
     }
 
     /**

@@ -13,7 +13,10 @@
                 <img src="<?=$assetDir?>/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Fernanda Rozas</a>
+	            <?php
+		            $user = \backend\models\Profile::find()->where(['iduser' => Yii::$app->user->id ])->one();
+		        ?>
+                <a href="#" class="d-block"><?= $user->name . " " . $user->lastname?></a>
             </div>
         </div>
 
@@ -33,6 +36,21 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <?php
+            $session = Yii::$app->session;
+            $userModules = $session->get('userModules');
+            if(!$userModules){
+				\backend\components\Helper::loadModules();
+            }
+            $userModules = $session->get('userModules');
+            $menuItems = [];
+            foreach ($userModules as $item) {
+				if($item['name'] == 'image') continue;
+                $menuItems[] = [
+                    'label' => $item['descrip'],
+                    'url' => [$item['name']."/index"],
+                    'icon' => 'th', // Aquí puedes cambiar el icono según necesites
+                ];
+            }
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     [
@@ -43,31 +61,37 @@
                             ['label' => 'Active Page', 'url' => ['site/index'], 'iconStyle' => 'far'],
                             ['label' => 'Inactive Page', 'iconStyle' => 'far'],
                         ]
-                    ],
-                    ['label' => 'Requerimientos', 'url' => ['req/index'], 'icon' => 'th'],
+                    ]
+                ]
+                ]);
+            echo \hail812\adminlte\widgets\Menu::widget([
+                'items' => $menuItems,
+            ]);
+            echo \hail812\adminlte\widgets\Menu::widget([ 
+                'items' => [
 #                    ['label' => 'Yii2 PROVIDED', 'header' => true],
                     ['label' => 'Login', 'url' => ['site/login'], 'icon' => 'sign-in-alt', 'visible' => Yii::$app->user->isGuest],
 #                    ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
 #                    ['label' => 'Debug', 'icon' => 'bug', 'url' => ['/debug'], 'target' => '_blank'],
-                    ['label' => 'MULTI LEVEL', 'header' => true],
-                    ['label' => 'Level1'],
-                    [
-                        'label' => 'Level1',
-                        'items' => [
-                            ['label' => 'Level2', 'iconStyle' => 'far'],
-                            [
-                                'label' => 'Level2',
-                                'iconStyle' => 'far',
-                                'items' => [
-                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle'],
-                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle'],
-                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle']
-                                ]
-                            ],
-                            ['label' => 'Level2', 'iconStyle' => 'far']
-                        ]
-                    ],
-                    ['label' => 'Level1'],
+#                    ['label' => 'MULTI LEVEL', 'header' => true],
+#                    ['label' => 'Level1'],
+#                    [
+#                        'label' => 'Level1',
+#                        'items' => [
+#                            ['label' => 'Level2', 'iconStyle' => 'far'],
+#                            [
+#                                'label' => 'Level2',
+#                                'iconStyle' => 'far',
+#                                'items' => [
+#                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle'],
+#                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle'],
+#                                    ['label' => 'Level3', 'iconStyle' => 'far', 'icon' => 'dot-circle']
+#                                ]
+#                            ],
+#                           ['label' => 'Level2', 'iconStyle' => 'far']
+#                        ]
+#                    ],
+#                    ['label' => 'Level1'],
                     ['label' => 'LABELS', 'header' => true],
                     ['label' => 'Important', 'iconStyle' => 'far', 'iconClassAdded' => 'text-danger'],
                     ['label' => 'Warning', 'iconClass' => 'nav-icon far fa-circle text-warning'],

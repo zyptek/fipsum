@@ -17,8 +17,8 @@ class PquoteSearch extends Pquote
     public function rules()
     {
         return [
-            [['id', 'idprovider', 'cost', 'idreq'], 'integer'],
-            [['created_at'], 'safe'],
+            [['id', 'idprovider', 'cost', 'idreq', 'selected'], 'integer'],
+            [['created_at', 'description', 'activities', 'valunt', 'payopt', 'exedr', 'exehr', 'tac'], 'safe'],
         ];
     }
 
@@ -63,7 +63,16 @@ class PquoteSearch extends Pquote
             'cost' => $this->cost,
             'created_at' => $this->created_at,
             'idreq' => $this->idreq,
+            'selected' => $this->selected,
         ]);
+
+        $query->andFilterWhere(['like', 'description', $this->description])
+            ->andFilterWhere(['like', 'activities', $this->activities])
+            ->andFilterWhere(['like', 'valunt', $this->valunt])
+            ->andFilterWhere(['like', 'payopt', $this->payopt])
+            ->andFilterWhere(['like', 'exedr', $this->exedr])
+            ->andFilterWhere(['like', 'exehr', $this->exehr])
+            ->andFilterWhere(['like', 'tac', $this->tac]);
 
         return $dataProvider;
     }

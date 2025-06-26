@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
         
 
         <?= $form->field($model, 'idrole')->dropDownList(
-        ArrayHelper::map(\backend\models\Role::find()->all(), 'id', 'name'),
+        ArrayHelper::map(\backend\models\Role::find()->where(['<','id',10])->all(), 'id', 'name'),
         [
             'prompt' => 'Seleccione...',
         ]

@@ -3,12 +3,15 @@
 namespace backend\models;
 
 use Yii;
+use common\models\User;
+
 
 /**
  * This is the model class for table "req".
  *
  * @property int $id
- * @property string $idalt ST o Ticket
+ * @property string $nst ST o Ticket
+ * @property string|null $nceco
  * @property string $inidetail
  * @property string|null $description
  * @property int $estdays
@@ -19,6 +22,7 @@ use Yii;
  * @property int $idbranch
  * @property int $idsolicitor
  * @property int $idcompany
+ * @property int|null $tecasigned
  * @property string $created_at
  * @property string $updated_at
  *
@@ -29,7 +33,11 @@ use Yii;
  * @property Solicitor $idsolicitor0
  * @property Status $idstatus0
  * @property Tos $idtos0
+ * @property Pquote[] $pquotes
  * @property Reqhist[] $reqhists
+ * @property SquoteDetail[] $squoteDetails
+ * @property Squote[] $squotes
+ * @property User $tecasigned0
  */
 class Req extends \yii\db\ActiveRecord
 {
@@ -47,11 +55,11 @@ class Req extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['idalt', 'inidetail', 'estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor', 'idcompany'], 'required'],
+            [['inidetail', 'estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor', 'idcompany'], 'required'],
             [['inidetail', 'description'], 'string'],
-            [['estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor', 'idcompany'], 'integer'],
+            [['estdays', 'idactivity', 'idtos', 'idstatus', 'idkam', 'idbranch', 'idsolicitor', 'idcompany', 'tecasigned'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['idalt'], 'string', 'max' => 20],
+            [['nst', 'nceco'], 'string', 'max' => 20],
             [['idactivity'], 'exist', 'skipOnError' => true, 'targetClass' => Activity::class, 'targetAttribute' => ['idactivity' => 'id']],
             [['idbranch'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::class, 'targetAttribute' => ['idbranch' => 'id']],
             [['idcompany'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['idcompany' => 'id']],
@@ -59,6 +67,7 @@ class Req extends \yii\db\ActiveRecord
             [['idsolicitor'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitor::class, 'targetAttribute' => ['idsolicitor' => 'id']],
             [['idstatus'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['idstatus' => 'id']],
             [['idtos'], 'exist', 'skipOnError' => true, 'targetClass' => Tos::class, 'targetAttribute' => ['idtos' => 'id']],
+            [['tecasigned'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['tecasigned' => 'id']],
         ];
     }
 
@@ -69,10 +78,11 @@ class Req extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'Nº IT',
-            'idalt' => 'N° ST',
+            'nst' => 'Nº ST',
+            'nceco' => 'CECO',
             'inidetail' => 'Detalle',
             'description' => 'Descripción',
-            'estdays' => 'Tiempo Estimado',
+            'estdays' => 'Tiempo Estimado (Dias)',
             'idactivity' => 'Actividad',
             'idtos' => 'Tipo de Venta',
             'idstatus' => 'Status',
@@ -80,11 +90,12 @@ class Req extends \yii\db\ActiveRecord
             'idbranch' => 'Sucursal',
             'idsolicitor' => 'Solicitante',
             'idcompany' => 'Cliente',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'tecasigned' => 'Técnico Asignado',
+            'created_at' => 'Creado',
+            'updated_at' => 'Actualizado',
         ];
     }
-            
+
     /**
      * Gets query for [[Idactivity0]].
      *
@@ -122,9 +133,12 @@ class Req extends \yii\db\ActiveRecord
      */
     public function getKam()
     {
-        return $this->hasOne(Kam::class, ['id' => 'idkam']);
+        return $this->hasOne(User::class, ['id' => 'idkam']);
     }
-
+    public function getProfile()
+    {
+        return $this->hasOne(Profile::class, ['iduser' => 'idkam']);
+    }
     /**
      * Gets query for [[Idsolicitor0]].
      *
@@ -156,13 +170,53 @@ class Req extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Pquotes]].
+     *
+     * @return \yii\db\ActiveQuery|PquoteQuery
+     */
+    public function getPquotes()
+    {
+        return $this->hasMany(Pquote::class, ['idreq' => 'id']);
+    }
+    /**
      * Gets query for [[Reqhists]].
      *
      * @return \yii\db\ActiveQuery|ReqhistQuery
      */
-    public function getReqhist()
+    public function getReqhists()
     {
         return $this->hasMany(Reqhist::class, ['idreq' => 'id']);
+    }
+
+    /**
+     * Gets query for [[SquoteDetails]].
+     *
+     * @return \yii\db\ActiveQuery|SquoteDetailQuery
+     */
+    public function getSquoteDetails()
+    {
+        return $this->hasMany(SquoteDetail::class, ['idreq' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Squotes]].
+     *
+     * @return \yii\db\ActiveQuery|SquoteQuery
+     */
+    public function getSquotes()
+    {
+        return $this->hasMany(Squote::class, ['idreq' => 'id']);
+    }
+
+
+    /**
+     * Gets query for [[Tecasigned0]].
+     *
+     * @return \yii\db\ActiveQuery|UserQuery
+     */
+    public function getTecnico()
+    {
+        return $this->hasOne(Profile::class, ['iduser' => 'tecasigned']);
     }
 
     /**

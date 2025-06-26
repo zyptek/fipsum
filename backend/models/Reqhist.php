@@ -102,7 +102,6 @@ class Reqhist extends \yii\db\ActiveRecord
     # Relacones Custom
     public function getProfile()
 	{
-	    return $this->hasOne(Profile::class, ['iduser' => 'iduser'])
-	                ->via('user'); // Usamos la relación `user`
+	    return $this->hasOne(Profile::class, ['iduser' => 'iduser']);
 	}
 }

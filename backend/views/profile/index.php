@@ -6,19 +6,17 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-use hail812\adminlte\widgets\Alert;
+#use hail812\adminlte\widgets\Alert;
+use backend\components\CustomAlert as Alert;
 /** @var yii\web\View $this */
 /** @var backend\models\ProfileSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$titulos = Yii::$app->params['alertTitles'] ?? [];
-
 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-    // Asegúrate de que el tipo de mensaje sea válido para el widget Alert
     if (in_array($type, ['success', 'info', 'danger', 'warning'], true)) {
         echo Alert::widget([
-            'type' => $type, // Asigna dinámicamente el tipo de alerta
-            'body' => $message, // Muestra el mensaje correspondiente
+            'type' => $type,
+            'body' => $message,
         ]);
     }
 }
@@ -62,7 +60,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 	return ucwords($result);
                 }
 			],
-            'created_at',
+            [
+            	'attribute' => 'created_at',
+            	'value' => function($model){
+	            	return substr($model->created_at, 0, 10);
+            	}
+            ],
             //'updated_at',
             [
                 'class' => ActionColumn::className(),

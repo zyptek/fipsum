@@ -53,7 +53,9 @@ use yii\web\JsExpression;
     
     <?php # = $form->field($model, 'idkam')->textInput() ?>
 
-    <?= $form->field($model, 'idalt')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'nst')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'nceco')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'idtos')->dropDownList(
     ArrayHelper::map(
@@ -97,7 +99,7 @@ use yii\web\JsExpression;
         );
     }else{
         echo $form->field($model, 'idstatus')->dropDownList(
-            ArrayHelper::map(\backend\models\Status::find()->where(['>', 'id', 11])->all(), 'id', 'name'),
+            ArrayHelper::map(\backend\models\Status::find()->where(['<=', 'id', 2])->all(), 'id', 'name'),
             [
                 'prompt' => 'Seleccione...',
             ]

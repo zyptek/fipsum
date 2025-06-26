@@ -10,7 +10,7 @@ use yii\widgets\Pjax;
 /** @var backend\models\ProviderSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Providers';
+$this->title = 'Proveedores';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="provider-index">
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Provider', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Ingresar Proveedor', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -29,13 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
             'name',
-            'idregion',
             'city',
             'address',
-            //'contact',
+            'contact',
             //'email:email',
             //'active',
             //'created_at',

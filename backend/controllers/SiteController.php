@@ -28,9 +28,17 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'signup', 'activate', 'change-password'],
+                        'actions' => ['login', 'error', 'signup'],
                         'allow' => true,
                         'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['activate', 'change-password'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                        'denyCallback' => function ($rule, $action) {
+                            return Yii::$app->response->redirect(['site/index']);
+                        },
                     ],
                     [
                         'actions' => ['logout', 'index'],
@@ -85,6 +93,19 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+	        
+	        # Cargamos la lista de vistas disponibles para el usuario
+	        $session = Yii::$app->session;
+	        $userModules = \backend\models\Module::find()
+                ->select(['name', 'descrip']) // Solo selecciona las columnas necesarias.
+                ->innerJoin('user_module', 'module.id = user_module.idmodule') // Une con la tabla intermedia.
+                ->where(['user_module.iduser' => Yii::$app->user->id]) // Filtra por el ID del usuario.
+                ->asArray() // Retorna los resultados como un array.
+                ->all();
+                
+		    $session->set('userModules',$userModules);
+	        $profile = \backend\models\Profile::find()->where(['iduser' => Yii::$app->user->id ])->one();
+	        $session->set('userRole',$profile->idrole);
             return $this->goBack();
         }
 
@@ -145,20 +166,22 @@ class SiteController extends Controller
 #		$bla = User::find()->where(['password_reset_token' => $token])->one();
 #		Yii::info(print_r($bla, true), 'debug');
 		
-		Yii::info('Token recibido desde URL: ' . $token, __METHOD__);
-		Yii::info('Contraseña temporal cifrada recibida: ' . $temp, __METHOD__);
+#		Yii::info('Token recibido desde URL: ' . $token, __METHOD__);
+#		Yii::info('Contraseña temporal cifrada recibida: ' . $temp, __METHOD__);
 	    
 	    $user = User::findByTempPasswordResetToken($token);
 	
 	    if (!$user) {
-	        Yii::error('Token inválido o usuario no encontrado.', __METHOD__);
-	        throw new \yii\web\NotFoundHttpException('Token inválido.');
+#	        Yii::error('Token inválido o usuario no encontrado.', __METHOD__);
+            Yii::$app->session->setFlash('danger', 'Token inválido.');
+#	        throw new \yii\web\NotFoundHttpException('Token inválido.');
+            return $this->redirect(['site/login']);
 	    }
 	
-		Yii::info('Usuario encontrado: ID ' . $user->id, __METHOD__);
+#		Yii::info('Usuario encontrado: ID ' . $user->id, __METHOD__);
 		
 	    $tempPassword = Yii::$app->security->decryptByKey($temp, Yii::$app->params['encryptionKey']);
-        Yii::info('Contraseña temporal cifrada recibida2: ' . $tempPassword, __METHOD__);
+ #       Yii::info('Contraseña temporal cifrada recibida2: ' . $tempPassword, __METHOD__);
 	    if (!$tempPassword) {
 	        Yii::error('Error al desencriptar la contraseña temporal.', __METHOD__);
 	        throw new \yii\web\ForbiddenHttpException('Enlace de activación inválido.');
@@ -175,11 +198,12 @@ class SiteController extends Controller
 #	    Yii::$app->user->login($user);
 	    Yii::$app->session->setFlash('info', 'Por favor, cambia tu contraseña temporal.');
 	    Yii::debug('Accediendo a common\\models\\User::identity en ' . __FILE__ . ' en la línea ' . __LINE__);
-	    $model = new ChangePasswordForm();
-	    return $this->render('change-password', [
+#	    $model = new ChangePasswordForm();
+/* 	    return $this->redirect('change-password', [
 		    'model' => $model,
 	    	'id' => $user->id
-	    	]);
+	    	]); */
+        return $this->runAction('change-password', ['id' => $user->id]);
 
 	}
 
@@ -187,19 +211,23 @@ class SiteController extends Controller
 	public function actionChangePassword($id)
 	{
 		$this->layout = 'blank';
-	    $model = new \backend\models\ChangePasswordForm();
-	
+	    $model = new ChangePasswordForm();
+#        $userModel = new User();
+        $user = User::find()->where(['id' => $id])->one();
+        
 	    if ($model->load(Yii::$app->request->post()) && $model->validate(false)) {
             if($user->status === User::STATUS_ACTIVE){
                 throw new \Exception('El usuario ya ha sido validado!' . json_encode($user->errors));
                 return $this->redirect(['site/index']);
             }
-	        $user->id = Yii::$app->request->post('id');
+#	        $user->id = Yii::$app->request->post('id');
+
 	        $user->setPassword($model->newPassword);
             $user->status = User::STATUS_ACTIVE;
+            $user->removePasswordResetToken(); // Limpiar token
 	        $user->save(false);
 	
-	        Yii::$app->session->setFlash('success', 'Tu contraseña ha sido actualizada.');
+	        Yii::$app->session->setFlash('success', 'Su contraseña ha sido creada.');
 	        return $this->redirect(['site/index']);
 	    }
 	

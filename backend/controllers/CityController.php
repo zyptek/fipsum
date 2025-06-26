@@ -2,12 +2,13 @@
 
 namespace backend\controllers;
 
+use Yii;
 use backend\models\City;
 use backend\models\CitySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use yii\filters\AccessControl;
 /**
  * CityController implements the CRUD actions for City model.
  */
@@ -21,6 +22,19 @@ class CityController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+					'class' => AccessControl::className(),
+					'rules' => [
+						[
+							'actions' => [],//aplica a todas las acciones
+							'allow' => true,
+#							'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action) {
+                                return Yii::$app->permissionCheck->checkPermission($this->id, $action->id);
+							}
+						],
+					],
+				],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [

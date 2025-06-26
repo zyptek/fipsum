@@ -12,13 +12,19 @@ use yii\widgets\Pjax;
 
 $this->title = 'Cotizaciones';
 $this->params['breadcrumbs'][] = $this->title;
+# parche NUTZ
+$idreq = $idreq ?? false;
 ?>
 <div class="pquote-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
+	<pre>
 
+	</pre>
     <p>
-        <?php # = Html::a('Create Pquote', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Ingresar Cotización', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php # = Html::a('Generar Presupuesto', ['gen', 'idreq' => base64_encode(Yii::$app->security->encryptByKey($idreq,Yii::$app->params['encryptionKey']))], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Generar Presupuesto', ['gen', 'idreq' => $idreq], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -29,8 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-#            'id',
-			[
+            [
             	'attribute' => 'idprovider',
             	'value' => function ($model) {
                 	$result = $model->provider ? $model->provider->name : '(No definido)';
@@ -40,6 +45,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'cost',
             'created_at',
             'idreq',
+            //'selected',
+            //'description:ntext',
+            //'activities:ntext',
+            'valunt',
+            //'payopt:ntext',
+            //'exedr',
+            //'exehr',
+            //'tac:ntext',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Pquote $model, $key, $index, $column) {

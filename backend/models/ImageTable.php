@@ -7,9 +7,13 @@ use Yii;
 /**
  * This is the model class for table "image_table".
  *
+ * @property int $id
  * @property int $idimage
- * @property string $table_name
+ * @property string $tablename
  * @property int $idtable
+ *
+ * @property Image $idimage0
+ * @property Req $idtable0
  */
 class ImageTable extends \yii\db\ActiveRecord
 {
@@ -27,9 +31,11 @@ class ImageTable extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['idimage', 'table_name', 'idtable'], 'required'],
+            [['idimage', 'tablename', 'idtable'], 'required'],
             [['idimage', 'idtable'], 'integer'],
-            [['table_name'], 'string', 'max' => 255],
+            [['tablename'], 'string', 'max' => 255],
+            [['idimage'], 'exist', 'skipOnError' => true, 'targetClass' => Image::class, 'targetAttribute' => ['idimage' => 'id']],
+            [['idtable'], 'exist', 'skipOnError' => true, 'targetClass' => Req::class, 'targetAttribute' => ['idtable' => 'id']],
         ];
     }
 
@@ -39,10 +45,31 @@ class ImageTable extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'idimage' => 'Idimage',
-            'table_name' => 'Table Name',
+            'tablename' => 'Tablename',
             'idtable' => 'Idtable',
         ];
+    }
+
+    /**
+     * Gets query for [[Idimage0]].
+     *
+     * @return \yii\db\ActiveQuery|ImageQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(Image::class, ['id' => 'idimage']);
+    }
+
+    /**
+     * Gets query for [[Idtable0]].
+     *
+     * @return \yii\db\ActiveQuery|ReqQuery
+     */
+    public function getTable()
+    {
+        return $this->hasOne(Req::class, ['id' => 'idtable']);
     }
 
     /**

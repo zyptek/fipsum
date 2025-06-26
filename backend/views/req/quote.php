@@ -30,10 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a('Exportar a Word', ['export-word', 'id' => $model->id], [
-    'class' => 'btn btn-info',
-    'target' => '_blank',
-])?>
+
     </p>
 
 <h3>Información General</h3>
@@ -41,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-#            'idalt',
+#            'nst',
 			[
             	'attribute' => 'idcompany',
             	'value' => function(){
@@ -106,7 +103,11 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Solicitar Cotización', ['class' => 'btn btn-success']) ?>
+	    <?php $submitText = (count($pQuotes) > 0) ? "Re-Solicitar Cotizaciónes" : "Solicitar Cotización"; ?>
+        <?= Html::submitButton($submitText, ['class' => 'btn btn-success']) ?>
+        <?php if(count($pQuotes) > 0): ?>
+        <?= Html::a('Ver Cotizaciones Solicitadas', ['pquote/index', 'idreq' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?php endif; ?>
     </div>
 
     <?= Html::endForm() ?>

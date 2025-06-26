@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var backend\models\Pquote $model */
 
-$this->title = 'Ingresar Pquote';
-$this->params['breadcrumbs'][] = ['label' => 'Pquotes', 'url' => ['index']];
+$this->title = 'Ingresar Cotización';
+$this->params['breadcrumbs'][] = ['label' => 'Cotizaciones', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="pquote-create">

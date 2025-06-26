@@ -7,6 +7,7 @@ use backend\models\SolicitorSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * SolicitorController implements the CRUD actions for Solicitor model.

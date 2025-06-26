@@ -14,7 +14,8 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [ 
+    ],
     'components' => [
         'permissionCheck' => [
             'class' => 'backend\components\PermissionCheck',
@@ -60,6 +61,10 @@ return [
             'rules' => [
             ],
         ],
+        'db' => [
+        	'enableProfiling' => true,
+        	'enableLogging' => true,
+		],
     ],
     'params' => $params,
 ];

@@ -5,12 +5,15 @@ namespace backend\models;
 use Yii;
 use common\models\User;
 
+
 /**
  * This is the model class for table "profile".
  *
  * @property int $id
  * @property string|null $name
  * @property string|null $lastname
+ * @property string|null $alias
+ * @property string|null $telefono
  * @property int $iduser
  * @property int $idrole
  * @property string $created_at
@@ -39,6 +42,8 @@ class Profile extends \yii\db\ActiveRecord
             [['iduser', 'idrole'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'lastname'], 'string', 'max' => 45],
+            [['alias'], 'string', 'max' => 20],
+            [['telefono'], 'string', 'max' => 11],
             [['idrole'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['idrole' => 'id']],
             [['iduser'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['iduser' => 'id']],
         ];
@@ -53,6 +58,8 @@ class Profile extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Nombre',
             'lastname' => 'Apellido',
+            'alias' => 'Alias',
+            'telefono' => 'Teléfono',
             'iduser' => 'Iduser',
             'idrole' => 'Rol',
             'created_at' => 'Creado',
@@ -63,7 +70,7 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idrole0]].
      *
-     * @return \yii\db\ActiveQuery|RoleQuery
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
      */
     public function getRole()
     {
@@ -71,7 +78,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Gets query for [[Iduser0]].
      *
      * @return \yii\db\ActiveQuery|UserQuery
      */

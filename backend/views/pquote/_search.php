@@ -28,8 +28,24 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'idreq') ?>
 
+    <?php // echo $form->field($model, 'selected') ?>
+
+    <?php // echo $form->field($model, 'description') ?>
+
+    <?php // echo $form->field($model, 'activities') ?>
+
+    <?php // echo $form->field($model, 'valunt') ?>
+
+    <?php // echo $form->field($model, 'payopt') ?>
+
+    <?php // echo $form->field($model, 'exedr') ?>
+
+    <?php // echo $form->field($model, 'exehr') ?>
+
+    <?php // echo $form->field($model, 'tac') ?>
+
     <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+        <?= Html::submitButton('Buscar', ['class' => 'btn btn-primary']) ?>
         <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
     </div>
 

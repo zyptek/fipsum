@@ -2,11 +2,14 @@
 
 namespace backend\controllers;
 
+use Yii;
 use backend\models\Provider;
 use backend\models\ProviderSearch;
+use backend\models\ProviderRegion;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ProviderController implements the CRUD actions for Provider model.
@@ -21,6 +24,16 @@ class ProviderController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+	            'access' => [
+					'class' => AccessControl::className(),
+					'rules' => [
+						[
+							'actions' => [],//aplica a todas las acciones
+							'allow' => true,
+							'roles' => ['@'],
+						],
+					],
+				],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
@@ -55,7 +68,10 @@ class ProviderController extends Controller
      */
     public function actionView($id)
     {
+        $selectedList = \backend\models\ProviderRegion::find()->select('idregion')->where(['idprovider' => $id])->asArray()->all(); 
         return $this->render('view', [
+            'selectedList' => $selectedList,
+            'regionList' => \backend\models\Region::find()->where(['idcountry' => 40])->all(),
             'model' => $this->findModel($id),
         ]);
     }
@@ -70,14 +86,27 @@ class ProviderController extends Controller
         $model = new Provider();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->save(false)) {
+                $regions = Yii::$app->request->post('regions', []);
+                foreach ($regions as $regionId) {
+                    $providerRegion = new ProviderRegion(); // Modelo de la tabla unión
+                    $providerRegion->idprovider = $model->id; // ID del proveedor recién guardado
+                    $providerRegion->idregion = $regionId; // ID de la región seleccionada
+                    if (!$providerRegion->save(false)) {
+                        // Maneja errores si es necesario
+                        Yii::$app->session->setFlash('error', 'Error al guardar una región.');
+                    }
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
             $model->loadDefaultValues();
         }
 
+#        $regionList = \backend\models\Region::find()->where(['idcountry' => 40])->all();
         return $this->render('create', [
+            'selectedList' => [],
+            'regionList' => \backend\models\Region::find()->where(['idcountry' => 40])->all(),
             'model' => $model,
         ]);
     }
@@ -93,11 +122,24 @@ class ProviderController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save(false)) {
+            $regions = Yii::$app->request->post('regions', []);
+            foreach ($regions as $regionId) {
+                $providerRegion = new ProviderRegion(); // Modelo de la tabla unión
+                $providerRegion->idprovider = $model->id; // ID del proveedor recién guardado
+                $providerRegion->idregion = $regionId; // ID de la región seleccionada
+                if (!$providerRegion->save(false)) {
+                    // Maneja errores si es necesario
+                    Yii::$app->session->setFlash('error', 'Error al guardar una región.');
+                }
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
+        $selectedList = \backend\models\ProviderRegion::find()->select('idregion')->where(['idprovider' => $id])->asArray()->all();
         return $this->render('update', [
+            'selectedList' => $selectedList,
+            'regionList' => \backend\models\Region::find()->where(['idcountry' => 40])->all(),
             'model' => $model,
         ]);
     }

@@ -7,6 +7,7 @@ use backend\models\ImageSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 use Yii;
 
@@ -70,11 +71,12 @@ class ImageController extends Controller
      */
     public function actionCreate()
     {
-	    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $model = new Image();
+	    #Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        
 
 		if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {	
         	Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        	$model = new Image();
 	        $model->load(Yii::$app->request->post());
 	        
 	        $path = date('dmY');
@@ -91,21 +93,28 @@ class ImageController extends Controller
 	                $model->path = $path . '/' . $fileName;
 	                $model->name = $file->baseName;
 	                $model->active = 1;
-	
-	                if ($model->save()) {
-		                $relatedId = Yii::$app->request->post('relatedId');
-						$relatedModel = Yii::$app->request->post('relatedModel');
-						
+	                $relatedId = Yii::$app->request->post('relatedId');
+	                $relatedModel = Yii::$app->request->post('relatedModel');
+	                if(Yii::$app->request->post('idcat') == 9){
+						$model->idcat = Yii::$app->request->post('idcat');
+						// TODO: Modificar pquote->selected para pasar a la siguiente etapa
+						$pquoteModel = \backend\models\Pquote::find()
+							->where(['id' => $relatedId ])
+							->one();
+						$pquoteModel->selected = 1;
+						$pquoteModel->save(false);
+					}
+	                if ($model->save(false)) {
 						if ($relatedId && $relatedModel) {
 	                        $imageTable = new \backend\models\ImageTable();
 	                        $imageTable->idimage = $model->id; // ID de la imagen guardada
-	                        $imageTable->table_name = $relatedModel; // Nombre del modelo relacionado
+	                        $imageTable->tablename = $relatedModel; // Nombre del modelo relacionado
 	                        $imageTable->idtable = $relatedId; // ID del modelo relacionado
 	                        
-	                        if ($imageTable->save()) {
+	                        if ($imageTable->save(false)) {
 								return ['success' => true, 'message' => 'success.'];
                         	}else{
-	                        	return ['error' => true, 'message' => 'error x.'];
+	                        	return ['error' => true, 'message' => 'No se puede guardar ImageTable.'];
                         	}
 	                    }
 
@@ -116,6 +125,7 @@ class ImageController extends Controller
         }
 
 
+		$model = new Image();
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -151,6 +161,18 @@ class ImageController extends Controller
      */
     public function actionDelete($id)
     {
+	    
+	    if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {	
+        	Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        	$id = \Yii::$app->request->post('id');
+		    if ($id) {
+		        $image = Image::findOne($id);
+		        if ($image && $image->delete()) {
+		            return ['success' => true];
+		        }
+		    }
+		    return ['success' => false];
+        }
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Permisos', ['permissions', 'id' => $model->iduser], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Permisos', ['access', 'id' => $model->iduser], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Eliminar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -30,12 +30,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'name',
             'lastname',
-            'iduser',
-            'created_at',
-            'updated_at',
+#            'iduser',
+            [
+                'attribute' => 'created_at',
+                'value' => function($model){
+                    return substr($model->created_at, 0, 10);
+                }
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => function($model){
+                    return substr($model->updated_at, 0, 10);
+                }
+            ],
+
         ],
     ]) ?>
 

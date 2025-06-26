@@ -12,17 +12,18 @@ use yii\web\NotFoundHttpException;
 /** @var backend\models\ReqSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
+$session = Yii::$app->session;
+$role = $session->get('userRole');
+
 $this->title = 'Requerimientos';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="req-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('Ingresar Requerimiento', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -31,7 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
 #            ['class' => 'yii\grid\SerialColumn'],
-
 #            'id',
             [
 	            'attribute' => 'idbranch',
@@ -41,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 	$result = $company . "/" . $branch;
                 	return ucwords($result);
             	},
+            	'visible' => ($role != 5),
             ],
             [
 	            'attribute' => 'idstatus',
@@ -71,7 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 	return ucwords($result);
             	},
             ],	
-            'estdays',
+			[	'attribute' => 'estdays',
+				'label' => 'Tiempo Estimado',
+
+			],
             [
             	'attribute' => 'created_at',
             	'value' => function($model){
@@ -95,7 +99,14 @@ $this->params['breadcrumbs'][] = $this->title;
 	            	
             	}
             ],
-#            'idalt',
+            [
+	            'attribute' => 'qtyPquotes',
+            	'label' => 'Cotiz.',
+				'value' => function($model){
+					return $model->getPquotes()->count();
+				},
+			],
+#            'nst',
 #            'inidetail:ntext',
 #            'description:ntext',
 #            'idkam',
@@ -103,8 +114,13 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Req $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+#	                $id = base64_encode(Yii::$app->security->encryptByKey($model->id,Yii::$app->params['encryptionKey']));
+	                $id = $model->id;
+                    return Url::toRoute([$action, 'id' => $id]);
+                },
+                'visibleButtons' => [
+			        'delete' => ($role == 9), // Oculta el botón "eliminar" si $role es 9
+			    ],
             ],
         ],
     ]); ?>

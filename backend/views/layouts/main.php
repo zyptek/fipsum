@@ -66,6 +66,32 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 
 <?php $this->beginBody() ?>
 
+<noscript>
+    <div class="js-warning">
+        <p>JavaScript está desactivado en tu navegador. Para usar este sistema, habilita JavaScript.</p>
+        <style>
+            .js-warning {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                text-align: center;
+            }
+
+            body {
+                overflow: hidden; /* Evita interacción */
+            }
+        </style>
+    </div>
+</noscript>
+
 <div class="wrapper">
 	<?= LoadingStyle::widget([
     'iconSize' => 'fa-3x', // Opcional: ajusta el tamaño del icono (fa-1x, fa-2x, etc.)

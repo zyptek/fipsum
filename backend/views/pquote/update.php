@@ -5,10 +5,10 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var backend\models\Pquote $model */
 
-$this->title = 'Update Pquote: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Pquotes', 'url' => ['index']];
+$this->title = 'Update Cotización: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Cotizaciones', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Actualizar';
 ?>
 <div class="pquote-update">
 
@@ -16,6 +16,15 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
-    ]) ?>
+    ]);
+    ?>
+    <?= $this->render('//image/create', [
+    'model' => new \backend\models\Image(),
+    'relatedId' => $model->id, // ID del modelo Actual
+    'relatedModel' => 'Pquote', // Nombre del modelo
+    'idcat' => 9,
+	])
+	
+	?>
 
 </div>

@@ -10,9 +10,13 @@ use Yii;
  * @property int $id
  * @property string $path
  * @property string $name
+ * @property string $caption
  * @property int $active
+ * @property int $idcat
  * @property string $created_at
  * @property string $updated_at
+ *
+ * @property Imagecat $idcat0
  */
 class Image extends \yii\db\ActiveRecord
 {
@@ -30,11 +34,14 @@ class Image extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['path', 'name'], 'required'],
-            [['active'], 'integer'],
+            [['name', 'caption'], 'required'],
+            [['path'], 'required', 'message' => 'Debe seleccionar un archivo.'],
+            [['idcat'], 'required', 'message' => 'Por favor seleccione una categoría.'],
+            [['active', 'idcat'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['path'], 'string', 'max' => 255],
+            [['path', 'caption'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 245],
+            [['idcat'], 'exist', 'skipOnError' => true, 'targetClass' => Imagecat::class, 'targetAttribute' => ['idcat' => 'id']],
         ];
     }
 
@@ -45,12 +52,24 @@ class Image extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'path' => 'Path',
+            'path' => 'Ruta',
             'name' => 'Name',
+            'caption' => 'Caption',
             'active' => 'Active',
+            'idcat' => 'Idcat',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+
+    /**
+     * Gets query for [[Idcat0]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getCat()
+    {
+        return $this->hasOne(Imagecat::class, ['id' => 'idcat']);
     }
 
     /**

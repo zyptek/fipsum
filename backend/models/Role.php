@@ -9,10 +9,11 @@ use Yii;
  *
  * @property int $id
  * @property string $name
- * @property string|null $desc
+ * @property string|null $descrip
  * @property string $created_at
  * @property string $updated_at
  *
+ * @property Imagecat[] $imagecats
  * @property Profile[] $profiles
  */
 class Role extends \yii\db\ActiveRecord
@@ -34,7 +35,7 @@ class Role extends \yii\db\ActiveRecord
             [['name'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 45],
-            [['desc'], 'string', 'max' => 255],
+            [['descrip'], 'string', 'max' => 255],
         ];
     }
 
@@ -45,11 +46,21 @@ class Role extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Rol',
-            'desc' => 'Descripción',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'name' => 'Nombre',
+            'descrip' => 'Descripción',
+            'created_at' => 'Creado',
+            'updated_at' => 'Actualizado',
         ];
+    }
+
+    /**
+     * Gets query for [[Imagecats]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImages()
+    {
+        return $this->hasMany(Imagecat::class, ['idrole' => 'id']);
     }
 
     /**

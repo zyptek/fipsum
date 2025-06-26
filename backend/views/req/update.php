@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = 'Actualizar';
     'model' => new \backend\models\Image(),
     'relatedId' => $model->id, // ID del modelo Actual
     'relatedModel' => 'Req', // Nombre del modelo
-])
+	])
 ?>
 
 </div>
