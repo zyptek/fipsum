@@ -12,8 +12,16 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'altname')->textInput(['maxlength' => true]) ?>    
+    <?= $form->field($model, 'rut')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'giro')->textInput(['maxlength' => true]) ?>    
+    <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>    
+    <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'contact')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>    
 
-    <label>Regiones</label>
+    <label>Regiones (Cobertura)</label>
         <table class="table table-bordered">
             <?php
              // Array de regiones
@@ -50,13 +58,7 @@ use yii\widgets\ActiveForm;
             ?>
         </table>
 
-    <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'contact')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
 
     <div class="form-group">

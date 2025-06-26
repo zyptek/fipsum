@@ -8,6 +8,8 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 #use hail812\adminlte\widgets\Alert;
 use backend\components\CustomAlert as Alert;
+
+
 /** @var yii\web\View $this */
 /** @var backend\models\ProfileSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -41,32 +43,34 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-#            'id',
 			[
-				'attribute' => 'iduser',
-				'label' => 'E-mail',
-				'value' => function ($model) {
-		            $result = $model->user ? $model->user->email : '(No definido)';
-                	return ucwords($result);
-                }
+			    'attribute' => 'eMail',
+			    'value' => 'user.email',
+			    'filter' => Html::activeTextInput($searchModel, 'eMail', [
+			        'class' => 'form-control'
+			    ]),
 			],
             'name',
             'lastname',
 #            'iduser',
 			[
-				'attribute' => 'idrole',
-				'value' => function ($model) {
-		            $result = $model->role ? $model->role->name : '(No definido)';
-                	return ucwords($result);
-                }
+			    'attribute' => 'roleName',
+			    'value' => 'role.name',
+			    'filter' => Html::activeTextInput($searchModel, 'roleName', [
+			        'class' => 'form-control'
+			    ]),
 			],
-            [
-            	'attribute' => 'created_at',
-            	'value' => function($model){
-	            	return substr($model->created_at, 0, 10);
-            	}
-            ],
-            //'updated_at',
+
+			[
+			    'attribute' => 'created_at',
+			    'value' => 'created_at',
+			    'format' => ['date', 'php:Y-m-d'], // o simplemente 'text'
+			    'filter' => Html::beginTag('div', ['style' => 'display:flex; gap:4px; flex-direction:column']) .
+			        Html::activeInput('date', $searchModel, 'created_from', ['class' => 'form-control', 'placeholder' => 'Desde']) .
+			        Html::activeInput('date', $searchModel, 'created_to', ['class' => 'form-control', 'placeholder' => 'Hasta']) .
+			        Html::endTag('div'),
+			],
+			
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Profile $model, $key, $index, $column) {

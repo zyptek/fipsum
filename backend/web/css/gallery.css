@@ -33,3 +33,9 @@
     border-radius: 5px;
     text-decoration: none;
 }
+.image-checkbox{
+	position: absolute;
+    top: 5px; /* Ajusta la distancia desde la parte superior */
+    left: 5px; /* Ajusta la distancia desde la izquierda */
+    z-index: 10;
+}

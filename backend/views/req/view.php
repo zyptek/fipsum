@@ -44,18 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
 			
 		}
 		echo " ";
-		if ($hasRend || $role > 11) {
+		if ($hasRend || $role > 1) {
 			echo Html::a('Llenar DR', ['docrend/new', 'idreq' => $model->id], ['class' => 'btn btn-secondary']);
 			
 		}
 	?>
 	<?php if ($role > 5 ): ?>
-	<?= Html::a('Exportar', ['export-word', 'id' => $model->id], [
-    'class' => 'btn btn-dark',
-    'target' => '_blank',
-])?>
-    <?= Html::a('Doc AST', ['export-ast', 'id' => $model->id], ['class' => 'btn btn-dark', 'target' => '_blank',])?>
-    <?= Html::a('Doc AR', ['export-ar', 'id' => $model->id], ['class' => 'btn btn-dark', 'target' => '_blank',])?> 
+
     <?php endif; ?>
     <?php if($role != 6){
 	    echo Html::button('Asignar Técnico', [
@@ -66,6 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
 	        ]);
 	    }
 	    ?>
+	<?= Html::a('Cerrar Req', ['close', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => '¿Está seguro de que desea cerrar este requerimiento?',
+                'method' => 'post',
+            ],
+        ]) ?>
     </p>
 
     <?= DetailView::widget([
@@ -187,7 +189,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	echo ImageGalleryWidget::widget([
     'relatedId' => $model->id, // ID del modelo actual
     'relatedModel' => 'req', // Nombre de la tabla
-    'isDoc' => true,
+    'type' => 'doc',
 ]);
 ?>
 <h3>Imágenes</h3>
@@ -195,6 +197,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	echo ImageGalleryWidget::widget([
     'relatedId' => $model->id, // ID del modelo actual
     'relatedModel' => 'req', // Nombre de la tabla
+    'type' => 'img',
 
 ]);
 ?>

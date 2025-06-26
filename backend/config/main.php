@@ -14,9 +14,21 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [ 
+    'modules' => [
+	    'gridview' => ['class' => 'kartik\grid\Module'],
     ],
     'components' => [
+		'formatter' => [
+	        'class' => 'yii\i18n\Formatter',
+	        'locale' => 'es_ES',
+	        'defaultTimeZone' => 'America/Santiago',
+	        'dateFormat' => 'long',
+	        'timeFormat' => 'short',
+	        'datetimeFormat' => 'medium',
+	    ],
+	    'dynNavbar' => [
+	        'class' => 'backend\components\DynNavbar',
+	    ],
         'permissionCheck' => [
             'class' => 'backend\components\PermissionCheck',
         ],

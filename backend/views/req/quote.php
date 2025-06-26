@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-
+		<?= Html::a('Ingresar Cotización', ['pquote/create', 'idreq' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
 <h3>Información General</h3>

@@ -105,9 +105,9 @@ class ProviderController extends Controller
 
 #        $regionList = \backend\models\Region::find()->where(['idcountry' => 40])->all();
         return $this->render('create', [
-            'selectedList' => [],
-            'regionList' => \backend\models\Region::find()->where(['idcountry' => 40])->all(),
-            'model' => $model,
+        'selectedList' => [],
+        'regionList' => \backend\models\Region::find()->where(['idcountry' => 40])->all(),
+        'model' => $model,
         ]);
     }
 

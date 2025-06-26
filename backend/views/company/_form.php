@@ -13,9 +13,11 @@ use yii\helpers\ArrayHelper;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'branches')->textInput() ?>
 
     <?= $form->field($model, 'idregion')->dropDownList(
         ArrayHelper::map(\backend\models\Region::find()->where(['idcountry' => 40])->all(), 'id', 'name'),
@@ -24,9 +26,10 @@ use yii\helpers\ArrayHelper;
         ]
     ) ?>
 
-    <?= $form->field($model, 'branches')->textInput() ?>
-
-    <?= $form->field($model, 'active')->textInput() ?>
+    <?= $form->field($model, 'active')->radioList([
+    0 => 'Inactivo', 
+    1 => 'Activo'
+    ])->label('Visibilidad') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>

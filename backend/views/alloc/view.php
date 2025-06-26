@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             
         ]) ?>
+        <?= Html::a('Volver a Req', ['req/view', 'id' => $model->req->id], ['class' => 'btn btn-info']) ?>
         <?php endif; ?>
     </p>
 

@@ -53,10 +53,10 @@ class Company extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Nombre',
             'alias' => 'Alias',
-            'idregion' => 'Region',
-            'branches' => 'Sucursales',
+            'idregion' => 'Región',
+            'branches' => 'Número de Sucursales',
             'mc' => 'MC',
-            'active' => 'Active',
+            'active' => 'Visibilidad',
         ];
     }
 

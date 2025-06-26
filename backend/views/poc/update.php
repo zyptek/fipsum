@@ -3,14 +3,14 @@
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var backend\models\Ocomp $model */
+/** @var backend\models\Poc $model */
 
-$this->title = 'Actualizar Orden: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Órdenes', 'url' => ['index']];
+$this->title = 'Update Poc: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Pocs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Actualizar';
+$this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="ocomp-update">
+<div class="poc-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

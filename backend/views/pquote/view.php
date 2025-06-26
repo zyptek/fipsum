@@ -8,6 +8,9 @@ use yii\bootstrap5\Modal;
 
 /** @var yii\web\View $this */
 /** @var backend\models\Pquote $model */
+$session = Yii::$app->session;
+$role = $session->get('userRole');
+
 
 $this->title = "Cotización: ".$model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Cotizaciones', 'url' => ['index']];
@@ -19,15 +22,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Eliminar', ['delete', 'id' => $model->id], [
+	<?php
+		if($role >= 11){
+	        echo Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
+			echo Html::a('Eliminar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => '¿Está seguro de eliminar este ítem?',
                 'method' => 'post',
             ],
-        ]) ?>
-
+        ]);
+        } ?>
+        <?= Html::a('Descargar OC', ['export', 'id' => $model->id], [
+				'class' => 'btn btn-info',
+				'target' => '_blank',
+			]) ?>
+		<?= Html::a('Consolidar', ['close', 'id' => $model->id], ['class' => 'btn btn-secondary']) ?>
     </p>
 
     <?= DetailView::widget([
@@ -69,12 +79,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'valunt',
 			[
 				'attribute' => 'payopt:ntext',
+				'label' => 'Opciones de Pago',
 	            'value' => function($model){
 	            	return "Transferencia Electronica - Abono 50%";
             	}
             ],
 			[
-				'attribute' => 'payopt:ntext',
+				'attribute' => 'tac:ntext',
 	            'label' => 'Términos y Condiciones',
 	            'value' => function($model){
 	            	return $model->payopt != "" ? $model->payopt : "Sin Información";
@@ -90,12 +101,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	            	return $model->exedr != "" ? $model->exedr : "Sin Información";
             	}
             ],
-			[
+/*			[
 				'attribute' => 'tac:ntext',
 	            'value' => function($model){
 	            	return $model->tac != "" ? $model->tac : "Sin Información";
             	}
-            ],
+            ],*/
         ],
     ]);
     

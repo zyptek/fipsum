@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $descrip
+ * @property string|null $actions
  * @property string $created_at
  * @property string $updated_at
  *
@@ -33,6 +34,7 @@ class Module extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'descrip'], 'required'],
+            [['actions'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'descrip'], 'string', 'max' => 45],
         ];
@@ -45,10 +47,11 @@ class Module extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Modelo',
-            'descrip' => 'Identificador',
-            'created_at' => 'Creado',
-            'updated_at' => 'Actualizado',
+            'name' => 'Name',
+            'descrip' => 'Descripción',
+            'actions' => 'Actions',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
     }
 

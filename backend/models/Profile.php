@@ -64,6 +64,8 @@ class Profile extends \yii\db\ActiveRecord
             'idrole' => 'Rol',
             'created_at' => 'Creado',
             'updated_at' => 'Actualizado',
+            'roleName' => 'Rol',
+            'eMail' => 'E-mail',
         ];
     }
 

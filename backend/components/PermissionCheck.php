@@ -17,55 +17,41 @@ class PermissionCheck extends Component
      * @param string $action Nombre de la acción (create, read, update, delete).
      * @return bool True si el permiso está habilitado, False en caso contrario.
      */
-    public function checkPermission($moduleName, $action)
-    {
-        $userId = Yii::$app->user->id;
-        $moduleId = Module::find()->where(['name' => $moduleName])->one();
+	public function checkPermission($moduleName, $action)
+	{
+	    $userId = Yii::$app->user->id;
+	    if (!$userId) {
+	        return false;
+	    }
+	
+	    if ($this->hasFullAccess($userId)) {
+	        return true;
+	    }
+	
+	    $module = Module::find()->where(['name' => $moduleName])->one();
+	    if (!$module) {
+	        return false;
+	    }
+	
+	    $userModule = UserModule::find()
+	        ->where(['iduser' => $userId, 'idmodule' => $module->id])
+	        ->one();
+	
+	    if (!$userModule) {
+	        return false;
+	    }
+	
+	    $permissions = $userModule->getPermissions();
+		Yii::info('permisos: ' . print_r($action, true), __METHOD__);
+	    $hasPermission = isset($permissions[$action]) && $permissions[$action] == 1;
+		
+	    if (!$hasPermission) {
+	        $this->handleForbiddenAccess($moduleName, $userId);
+	    }
+	
+	    return $hasPermission;
+	}
 
-        Yii::info("Checking permission for user $userId on module $moduleName and action $action", __METHOD__);
-
-        // Si el usuario no está autenticado, denegar acceso
-        if (!$userId) {
-            Yii::info("User not authenticated", __METHOD__);
-            return false;
-        }
-
-        if ($this->hasFullAccess($userId)) {
-            Yii::info("User has full access due to role", __METHOD__);
-            return true;
-        }
-        // Mapear las acciones a los permisos
-        $actionToPermission = [
-            'create' => 'create',
-            'quote' => 'read',
-            'view'   => 'read',
-            'index'  => 'read',
-            'update' => 'update',
-            'delete' => 'delete',
-        ];
-
-        // Validar si la acción está soportada
-        if (!isset($actionToPermission[$action])) {
-            return false; // Acción no reconocida
-        }
-
-        
-        // Obtener los permisos del usuario para el módulo
-        $permissions = UserModule::find()
-            ->where(['iduser' => $userId, 'idmodule' => $moduleId])
-            ->asArray()
-            ->one();
-
-        $hasPermission = isset($permissions[$actionToPermission[$action]]) && $permissions[$actionToPermission[$action]] == 1;
-
-        if (!$hasPermission) {
-            // Redirección con mensaje si no tiene permiso
-            $this->handleForbiddenAccess($moduleName, $userId);
-        }
-
-        return $hasPermission;
-
-    }
 
     /**
      * Verifica si el usuario tiene acceso total basado en su rol.
@@ -88,23 +74,24 @@ class PermissionCheck extends Component
      * @return bool True si tiene al menos un permiso habilitado, False en caso contrario.
      */
     private function hasAnyPermission($moduleName, $userId)
-    {
-        $permissions = UserModule::find()
-            ->where(['iduser' => $userId, 'idmodule' => strtolower($moduleName)])
-            ->asArray()
-            ->one();
-
-        if (!$permissions) {
-            return false;
-        }
-
-        // Verificar si al menos un permiso está habilitado
-        return $permissions['create'] == 1 ||
-               $permissions['read'] == 1 ||
-               $permissions['update'] == 1 ||
-               $permissions['delete'] == 1;
-    }
-
+	{
+	    $module = Module::find()->where(['name' => $moduleName])->one();
+	    if (!$module) {
+	        return false;
+	    }
+	
+	    $userModule = UserModule::find()
+	        ->where(['iduser' => $userId, 'idmodule' => $module->id])
+	        ->one();
+	
+	    if (!$userModule) {
+	        return false;
+	    }
+	
+	    $permissions = $userModule->getPermissions();
+	
+	    return !empty(array_filter($permissions)); // Algún permiso activo
+	}
     /**
      * Maneja accesos prohibidos redirigiendo al usuario a actionIndex si tiene acceso
      * a alguna acción o lanzando un ForbiddenHttpException.
@@ -125,3 +112,5 @@ class PermissionCheck extends Component
         throw new ForbiddenHttpException('No tiene permitido ejecutar esta acción.');
     }
 }
+
+

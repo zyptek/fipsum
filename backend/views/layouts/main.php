@@ -54,7 +54,10 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     content: "\f110"; /* Código del nuevo ícono (en este caso, 'fa-cog') */
     font-weight: 900; /* Opcional: cambia el grosor del ícono */
 }
-	    </style>
+</style>
+<?php # --->   TABLER STYLES
+	# echo Html::cssFile('https://unpkg.com/@tabler/core@latest/dist/css/tabler.min.css') ?>
+
     <?php $this->head() ?>
 	<?php
 	#Registro de AppAsset.php

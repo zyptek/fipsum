@@ -3,11 +3,11 @@
 namespace backend\models;
 
 /**
- * This is the ActiveQuery class for [[Ocomp]].
+ * This is the ActiveQuery class for [[Inftec]].
  *
- * @see Ocomp
+ * @see Inftec
  */
-class OcompQuery extends \yii\db\ActiveQuery
+class InftecQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {
@@ -16,7 +16,7 @@ class OcompQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return Ocomp[]|array
+     * @return Inftec[]|array
      */
     public function all($db = null)
     {
@@ -25,7 +25,7 @@ class OcompQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return Ocomp|array|null
+     * @return Inftec|array|null
      */
     public function one($db = null)
     {

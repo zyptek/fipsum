@@ -11,14 +11,19 @@ use backend\models\Profile;
  */
 class ProfileSearch extends Profile
 {
+	public $roleName;
+	public $eMail;
+	public $created_from;
+	public $created_to;
+	
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'iduser'], 'integer'],
-            [['name', 'lastname', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'iduser', 'idrole'], 'integer'],
+            [['name', 'lastname', 'created_at', 'updated_at', 'roleName', 'eMail', 'created_from', 'created_to'], 'safe'],
         ];
     }
 
@@ -40,7 +45,7 @@ class ProfileSearch extends Profile
      */
     public function search($params)
     {
-        $query = Profile::find();
+        $query = Profile::find()->joinWith(['role', 'user']);
 
         // add conditions that should always apply here
 
@@ -49,23 +54,45 @@ class ProfileSearch extends Profile
         ]);
 
         $this->load($params);
-
+		
+		# Custom fields
+		$dataProvider->sort->attributes['roleName'] = [
+		    'asc' => ['role.name' => SORT_ASC],
+		    'desc' => ['role.name' => SORT_DESC],
+		];
+		$dataProvider->sort->attributes['eMail'] = [
+		    'asc' => ['user.email' => SORT_ASC],
+		    'desc' => ['user.email' => SORT_DESC],
+		];
+		
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
+		
+		if (!empty($this->created_from)) {
+		    $query->andWhere(['>=', 'profile.created_at', $this->created_from . ' 00:00:00']);
+		}
+		
+		if (!empty($this->created_to)) {
+		    $query->andWhere(['<=', 'profile.created_at', $this->created_to . ' 23:59:59']);
+		}
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
             'iduser' => $this->iduser,
-            'created_at' => $this->created_at,
+            'idrole' => $this->idrole,
+            'profile.created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'lastname', $this->lastname]);
+            ->andFilterWhere(['like', 'lastname', $this->lastname])
+            ->andFilterWhere(['like', 'role.name', $this->roleName])	
+            ->andFilterWhere(['like', 'user.email', $this->eMail])
+			->andFilterWhere(['like', 'DATE(profile.created_at)', $this->created_at]);
 
         return $dataProvider;
     }

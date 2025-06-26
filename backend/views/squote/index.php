@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Ingresar Presupuesto', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php #= Html::a('Ingresar Presupuesto', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
 
@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
 #            ['class' => 'yii\grid\SerialColumn'],
-            'id',
+#            'id',
 #            'cm',
 #            'cmp',
 			[
@@ -61,10 +61,17 @@ $this->params['breadcrumbs'][] = $this->title;
             	'label' => 'Fecha',
             ],
             [
-            	'attribute' => 'mc',
+            	'attribute' => 'squoteprivate.mcpct',
             	'label' => 'MC',
+            	'value' => function($model){
+	            	return isset($model->squoteprivate->mcpct) ? $model->squoteprivate->mcpct."%" : "(No Definido)";
+            	}
             ],
             'total',
+            [
+            	'attribute' => 'status.name',
+            	'label' => 'Estado',
+            ],
             //'accepted',
             //'author_accepted',
             //'date_accepted',

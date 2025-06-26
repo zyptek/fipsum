@@ -37,6 +37,11 @@ use yii\bootstrap4\Breadcrumbs;
     <!-- Main content -->
     <div class="content">
         <?= $content ?><!-- /.container-fluid -->
+        <?php # CONTENIDO DE PRUEBAS
+#	        echo "User ID: " .  Yii::$app->user->id;
+#	        echo "<br>";
+#	        echo "User Role: " .  Yii::$app->user->identity->profile->idrole; 
+	        ?>
     </div>
     <!-- /.content -->
 </div>

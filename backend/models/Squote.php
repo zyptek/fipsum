@@ -8,25 +8,30 @@ use Yii;
  * This is the model class for table "squote".
  *
  * @property int $id
+ * @property int $idreq
+ * @property int $idpquote
+ * @property int|null $idstatus
+ * @property int $noc
  * @property int|null $mc
  * @property float|null $cmp
- * @property int $subtotal
- * @property int $gg
- * @property int $neto
- * @property int $iva
+ * @property int|null $subtotal
+ * @property int|null $gg
+ * @property int|null $neto
+ * @property int|null $iva
  * @property int|null $total
- * @property string $created_at
  * @property int|null $accepted
  * @property int|null $author_accepted
  * @property string|null $date_accepted
  * @property int|null $approved_f
  * @property int|null $approved_c
- * @property int $idreq
- * @property int|null $idpquote
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property Pquote $idpquote0
  * @property Req $idreq0
+ * @property SquoteStatus $idstatus0
  * @property SquoteDetail[] $squoteDetails
+ * @property Squoteprivate $squoteprivate
  */
 class Squote extends \yii\db\ActiveRecord
 {
@@ -44,12 +49,13 @@ class Squote extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mc', 'subtotal', 'gg', 'neto', 'iva', 'total', 'accepted', 'author_accepted', 'approved_f', 'approved_c', 'idreq', 'idpquote'], 'integer'],
+            [['idreq', 'idpquote', 'noc'], 'required'],
+            [['idreq', 'idpquote', 'idstatus', 'noc', 'mc', 'subtotal', 'gg', 'neto', 'iva', 'total', 'accepted', 'author_accepted', 'approved_f', 'approved_c'], 'integer'],
             [['cmp'], 'number'],
-            [['subtotal', 'gg', 'neto', 'iva', 'idreq'], 'required'],
-            [['created_at', 'date_accepted'], 'safe'],
+            [['date_accepted', 'created_at', 'updated_at'], 'safe'],
             [['idpquote'], 'exist', 'skipOnError' => true, 'targetClass' => Pquote::class, 'targetAttribute' => ['idpquote' => 'id']],
             [['idreq'], 'exist', 'skipOnError' => true, 'targetClass' => Req::class, 'targetAttribute' => ['idreq' => 'id']],
+            [['idstatus'], 'exist', 'skipOnError' => true, 'targetClass' => SquoteStatus::class, 'targetAttribute' => ['idstatus' => 'id']],
         ];
     }
 
@@ -60,21 +66,24 @@ class Squote extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'idreq' => 'Requerimiento',
+            'idpquote' => 'Cotización',
+            'idstatus' => 'Status',
+            'noc' => 'Noc',
             'mc' => 'Mc',
             'cmp' => 'Cmp',
             'subtotal' => 'Subtotal',
-            'gg' => 'Gg',
+            'gg' => 'GG',
             'neto' => 'Neto',
             'iva' => 'Iva',
             'total' => 'Total',
-            'created_at' => 'Creado',
             'accepted' => 'Accepted',
             'author_accepted' => 'Author Accepted',
             'date_accepted' => 'Date Accepted',
             'approved_f' => 'Approved F',
             'approved_c' => 'Approved C',
-            'idreq' => 'Requerimiento',
-            'idpquote' => 'Idpquote',
+            'created_at' => 'Creado',
+            'updated_at' => 'Actualizado',
         ];
     }
 
@@ -99,6 +108,16 @@ class Squote extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Idstatus0]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getStatus()
+    {
+        return $this->hasOne(SquoteStatus::class, ['id' => 'idstatus']);
+    }
+
+    /**
      * Gets query for [[SquoteDetails]].
      *
      * @return \yii\db\ActiveQuery|SquoteDetailQuery
@@ -109,6 +128,16 @@ class Squote extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Squoteprivate]].
+     *
+     * @return \yii\db\ActiveQuery|SquoteprivateQuery
+     */
+    public function getSquoteprivate()
+    {
+        return $this->hasOne(Squoteprivate::class, ['idsquote' => 'id']);
+    }
+
+    /**
      * {@inheritdoc}
      * @return SquoteQuery the active query used by this AR class.
      */
@@ -116,12 +145,7 @@ class Squote extends \yii\db\ActiveRecord
     {
         return new SquoteQuery(get_called_class());
     }
-    
-    /**
-     * {@inheritdoc}
-     * @return Cliente the active query used by this AR class.
-     */
-    public function getCliente()
+	public function getCliente()
 	{
 	    return $this->hasOne(Company::class, ['id' => 'idcompany'])
 			->via('req');
@@ -136,14 +160,20 @@ class Squote extends \yii\db\ActiveRecord
 	    return $this->hasOne(Branch::class, ['id' => 'idbranch'])
 			->via('req');
 	}
+
+/*	
 	public function getStatus()
 	{
 	    return $this->hasOne(Status::class, ['id' => 'idstatus'])
 			->via('req');
 	}
+*/
+/*
 	public function getKam()
 	{
 	    return $this->hasOne(Profile::class, ['iduser' => 'idkam'])
 			->via('user');
 	}
+*/
+
 }

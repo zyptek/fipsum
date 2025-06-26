@@ -8,6 +8,7 @@ use backend\models\SquoteDetail;
 use backend\models\Pquote;
 use backend\models\SquoteSearch;
 use backend\models\Constants;
+use backend\models\Squoteprivate;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -128,9 +129,9 @@ class SquoteController extends Controller
     public function actionView($id)
     {
 
-
+		$const = Constants::find(1)->one();
         return $this->render('view', [
-
+			'const' => $const,
             'model' => $this->findModel($id),
         ]);
     }
@@ -166,19 +167,23 @@ class SquoteController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
-    {
-        
+    {   
         $model = $this->findModel($id);
         $idreq = $model->idreq;
 		$const = Constants::find(1)->one();
-		
-		
+		$go = false;	
+
         if ($this->request->isPost){
+	        $squotePrivate = Squoteprivate::find()->where(['idsquote' => $model->id])->one();
+
+	        if($squotePrivate->load($this->request->post()) && $squotePrivate->save()){
+				$go = true;
+	        }
             #Tomamos datos desde POST
 			$data = $this->request->post();
 			# Asignamos datos al modelo Squote
 
-            if (isset($data['item'], $data['detalle'], $data['unidad'], $data['precio_unitario'], $data['cantidad'], $data['total'])){
+            if (isset($data['item'], $data['detalle'], $data['unidad'], $data['precio_unitario'], $data['cantidad'], $data['total']) && $go){
                 
 				# Agregamos datos al modelo:
 				$model->subtotal = $data['subtotal'] ?? null;
@@ -186,33 +191,46 @@ class SquoteController extends Controller
 				$model->neto = $data['neto'] ?? null;
 				$model->iva = $data['iva'] ?? null;
 				$model->total = $data['grand-total'] ?? null;
-
-                if($model->save(false)){
-                    foreach ($data['item'] as $index => $item) {
-		
-		                // Crear y guardar el modelo
-		                $squoteDetail = new SquoteDetail();
-		                $squoteDetail->idsquote = $model->id;
-		                $squoteDetail->idreq = $idreq;
-		                $squoteDetail->item = $data['item'][$index] ?? null;
-		                $squoteDetail->descrip = $data['detalle'][$index] ?? null;
-		                $squoteDetail->unit = $data['unidad'][$index] ?? null;
-		                $squoteDetail->cost = $data['precio_unitario'][$index] ?? null;
-		                $squoteDetail->quant = $data['cantidad'][$index] ?? null;
-		                $squoteDetail->total = $data['total'][$index] ?? null;
 				
-						if (!$squoteDetail->save()) {
-		                    // Manejo de errores si no se puede guardar
-		                    Yii::$app->session->setFlash('error', 'Error al guardar el detalle en la fila: ' . $index);
-		                    return $this->render('update', [
-			                    'const' => $const,
-                                'model' => $model,
-                            ]);
-		                }
-                    }
+/*
+				if($model->noc == 0){
+					do {
+				        $noc = mt_rand(10000, 99999);
+				    } while (Squote::findOne(['noc' => $noc]));
+					$model->noc = $noc;
+				}else{
+					Yii::$app->session->setFlash('error', 'Error al guardar el noc');
+				}
+*/
 
-                    Yii::$app->session->setFlash('success', 'Todos los detalles se han guardado correctamente.');
-                    return $this->redirect(['view', 'id' => $model->id]);
+                if($model->save() && $go){
+                    $transaction = Yii::$app->db->beginTransaction();
+                    SquoteDetail::deleteAll(['idsquote' => $model->id]);
+					try {
+					    foreach ($data['item'] as $index => $item) {
+					        $squoteDetail = new SquoteDetail();
+					        $squoteDetail->idsquote = $model->id;
+					        $squoteDetail->idreq = $idreq;
+					        $squoteDetail->item = $data['item'][$index] ?? null;
+					        $squoteDetail->descrip = $data['detalle'][$index] ?? null;
+					        $squoteDetail->unit = $data['unidad'][$index] ?? null;
+					        $squoteDetail->cost = $data['precio_unitario'][$index] ?? null;
+					        $squoteDetail->quant = $data['cantidad'][$index] ?? null;
+					        $squoteDetail->total = $data['total'][$index] ?? null;
+					
+					        if (!$squoteDetail->save()) {
+					            throw new \Exception('Error al guardar el detalle en la fila: ' . $index);
+					        }
+					    }
+					
+					    $transaction->commit();
+					    Yii::$app->session->setFlash('success', 'Todos los detalles se han guardado correctamente.');
+					    return $this->redirect(['view', 'id' => $model->id]);
+					} catch (\Exception $e) {
+					    $transaction->rollBack();
+					    Yii::$app->session->setFlash('error', $e->getMessage());
+					}
+
 				}else{
 					Yii::$app->session->setFlash('error', 'No se pudo crear la cotización.');
                     return $this->render('update', [
@@ -224,6 +242,7 @@ class SquoteController extends Controller
             
         }
 
+		
         return $this->render('update', [
 	        'const' => $const,
             'model' => $model,
@@ -289,6 +308,10 @@ class SquoteController extends Controller
 	    
 	    $pquote = Pquote::find()->where(['idreq' => $idreq])->one();
 		$model = Squote::find()->where(['idreq'=> $idreq])->one();
+		
+		if(!$model){
+			$model = new Squote();
+		}
 		
         return $this->render('new', [
 	        'model' => $model,

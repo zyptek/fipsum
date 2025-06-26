@@ -25,30 +25,40 @@ use yii\web\JsExpression;
     <?php
 	if(Yii::$app->controller->action->id == 'update'){
 		echo $form->field($model, 'idbranch')->dropDownList(
-	        ArrayHelper::map(\backend\models\Branch::find()->all(), 'id', 'name'),
+	        ArrayHelper::map(\backend\models\Branch::find()->where(['idcompany' => $model->idcompany])->all(), 'id', 'name'),
 	        [
 	            'options' => [$model->idbranch => ['Selected' => true],],
-	        ]
+	        ],
 	    );
 	}else{    
 		echo $form->field($model, 'idbranch')->dropDownList(
         [], // Inicialmente vacío
         [
             'prompt' => 'Seleccione Cliente...',
-            'id' => 'select-branch', // ID para manejar con JS
+            'id' => 'req-idbranch', // ID para manejar con JS
         ]
     )->label('Sucursal'); 
     }?>
     
     <?php # $form->field($model, 'idbranch')->textInput()->label("Sucursal") ?>
     
-    <?= $form->field($model, 'idsolicitor')->dropDownList(
+    <?php
+	if(Yii::$app->controller->action->id == 'update'){
+		echo $form->field($model, 'idsolicitor')->dropDownList(
+	        ArrayHelper::map(\backend\models\Solicitor::find()->where(['idcompany' => $model->idcompany])->all(), 'id', 'name'),
+	        [
+	            'options' => [$model->idsolicitor => ['Selected' => true],],
+	        ],
+	    );
+	}else{
+		echo $form->field($model, 'idsolicitor')->dropDownList(
         ArrayHelper::map(\backend\models\Solicitor::find()->all(), 'id', 'name'),
         [
             'prompt' => 'Seleccione...',
-            'id' => 'select-solicitor', // ID para manejar con JS
+            'id' => 'req-idsolicitor', // ID para manejar con JS
         ]
-    ) ?>
+    );
+    }?>
     <?php # = $form->field($model, 'idsolicitor')->textInput() ?>
     
     <?php # = $form->field($model, 'idkam')->textInput() ?>

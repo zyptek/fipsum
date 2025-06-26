@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use yii\grid\GridView;
 
 /** @var $this yii\web\View */
 /** @var $user common\models\User */
@@ -26,41 +25,29 @@ $this->params['breadcrumbs'][] = $this->title;
         <thead>
             <tr>
                 <th>Módulo</th>
-                <th>Crear</th>
-                <th>Leer</th>
-                <th>Actualizar</th>
-                <th>Eliminar</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($modules as $module): ?>
-                <?php
-                $permissions = $userModules[$module['id']] ?? ['create' => 0, 'read' => 0, 'update' => 0, 'delete' => 0];
-                ?>
-                <tr>
-                    <td><?= Html::encode($module['descrip']) ?></td>
-                    <td>
-                        <?= Html::checkbox("permissions[{$module['id']}][create]", $permissions['create'], [
-                            'label' => '',
-                        ]) ?>
-                    </td>
-                    <td>
-                        <?= Html::checkbox("permissions[{$module['id']}][read]", $permissions['read'], [
-                            'label' => '',
-                        ]) ?>
-                    </td>
-                    <td>
-                        <?= Html::checkbox("permissions[{$module['id']}][update]", $permissions['update'], [
-                            'label' => '',
-                        ]) ?>
-                    </td>
-                    <td>
-                        <?= Html::checkbox("permissions[{$module['id']}][delete]", $permissions['delete'], [
-                            'label' => '',
-                        ]) ?>
-                    </td>
-                </tr>
+    <?php
+    $moduleActions = json_decode($module['actions'], true);
+    $permissions = isset($userModules[$module['id']]['permissions']) ? json_decode($userModules[$module['id']]['permissions'], true) : [];
+    ?>
+    <tr>
+        <td><?= Html::encode($module['descrip']) ?></td>
+        <td>
+            <?php foreach ($moduleActions as $action => $label): ?>
+                <label style="margin-right:10px;">
+            	<input type="hidden" name="<?php echo "permissions[{$module['id']}][ignore]"; ?>" value="1">
+                    <?= Html::checkbox("permissions[{$module['id']}][{$action}]", !empty($permissions[$action]), [
+                        'label' => $label,
+                    ]) ?>
+                </label>
             <?php endforeach; ?>
+        </td>
+    </tr>
+<?php endforeach; ?>
         </tbody>
     </table>
 

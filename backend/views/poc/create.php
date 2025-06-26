@@ -3,13 +3,13 @@
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var backend\models\Ocomp $model */
+/** @var backend\models\Poc $model */
 
-$this->title = 'Ingresar Orden de Compra';
-$this->params['breadcrumbs'][] = ['label' => 'Órdenes', 'url' => ['index']];
+$this->title = 'Create Poc';
+$this->params['breadcrumbs'][] = ['label' => 'Pocs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="ocomp-create">
+<div class="poc-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

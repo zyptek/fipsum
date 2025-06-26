@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Ingresar DR', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php # = Html::a('Ingresar DR', ['new'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -34,6 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'assigned_amount',
             'expended_amount',
             'difference',
+            [
+	            'attribute' => 'solicitor.email',
+            ],
             //'total',
             //'responsable',
             //'presented_by',

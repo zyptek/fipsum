@@ -231,25 +231,6 @@ class ProfileController extends Controller
             'model' => $model,
         ]);
     }
-    
-    public function actionUpdatePermissions($id)
-    {
-        $user = User::findOne($id);
-        if (!$user) {
-            throw new \yii\web\NotFoundHttpException('El usuario no existe.');
-        }
-
-        if (Yii::$app->request->isPost) {
-            $permissions = Yii::$app->request->post('permissions', []);
-            UserModule::updateUserPermissions($id, $permissions);
-
-            Yii::$app->session->setFlash('success', 'Permisos actualizados correctamente.');
-            return $this->redirect(['profile/view', 'id' => $id]);
-        }
-
-        Yii::$app->session->setFlash('error', 'Error al actualizar los permisos.');
-        return $this->redirect(['profile/view', 'id' => $id]);
-    }
     public function actionAccess($id)
     {
         // Buscar el usuario por su ID
@@ -270,19 +251,42 @@ class ProfileController extends Controller
 
         // Procesar el formulario si se envió
         if (Yii::$app->request->isPost) {
-            $permissions = Yii::$app->request->post('permissions', []);
-            UserModule::updateUserPermissions($id, $permissions);
-
-            // Mensaje de éxito
-            Yii::$app->session->setFlash('success', 'Permisos actualizados correctamente.');
-
-            // Recargar permisos actualizados
-            $userModules = UserModule::find()
-                ->where(['iduser' => $id])
-                ->indexBy('idmodule')
-                ->asArray()
-                ->all();
-        }
+		    $permissionsPost = Yii::$app->request->post('permissions', []);
+			
+		    foreach ($permissionsPost as $moduleId => $actions) {
+		        $result = [];
+		
+		        $userModule = UserModule::findOne(['iduser' => $id, 'idmodule' => $moduleId]);
+		        if (!$userModule) {
+		            $userModule = new UserModule();
+		            $userModule->iduser = $id;
+		            $userModule->idmodule = $moduleId;
+		        }
+		
+		        $module = Module::findOne($moduleId);
+		        if (!$module) {
+		            continue; // Si no existe el módulo, sigue al siguiente
+		        }
+		
+		        $open_actions = json_decode($module->actions, true); // true para obtener array asociativo
+		        if (is_array($open_actions)) {
+		            foreach ($open_actions as $key => $value) {
+		                $result[$key] = array_key_exists($key, $actions) ? 1 : 0;
+		            }
+		        }
+#				Yii::info('resultado: ' . print_r($result, true), __METHOD__);
+		        $userModule->permissions = json_encode($result);
+		        $userModule->save(false);
+		    }
+		
+		    Yii::$app->session->setFlash('success', 'Permisos actualizados correctamente.');
+		
+		    $userModules = UserModule::find()
+		        ->where(['iduser' => $id])
+		        ->indexBy('idmodule')
+		        ->asArray()
+		        ->all();
+		}
 
         // Renderizar la vista
         return $this->render('access', [

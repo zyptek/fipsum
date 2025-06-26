@@ -5,15 +5,16 @@ namespace backend\models;
 use Yii;
 
 /**
- * This is the model class for table "ocomp".
+ * This is the model class for table "poc".
  *
  * @property int $id
- * @property int $noc
  * @property int $idtop
  * @property int $idvop
  * @property int $idreq
  * @property int $iduser
  * @property int $idprovider
+ * @property int $noc
+ * @property string $descrip
  * @property int $subtotal
  * @property int $neto
  * @property int $iva
@@ -27,14 +28,14 @@ use Yii;
  * @property User $iduser0
  * @property Vop $idvop0
  */
-class Ocomp extends \yii\db\ActiveRecord
+class Poc extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'ocomp';
+        return 'poc';
     }
 
     /**
@@ -43,9 +44,10 @@ class Ocomp extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['noc', 'idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'subtotal', 'neto', 'iva', 'total'], 'required'],
-            [['noc', 'idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'subtotal', 'neto', 'iva', 'total'], 'integer'],
+            [['idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'noc', 'descrip', 'subtotal', 'neto', 'iva', 'total'], 'required'],
+            [['idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'noc', 'subtotal', 'neto', 'iva', 'total'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
+            [['descrip'], 'string', 'max' => 255],
             [['noc'], 'unique'],
             [['idprovider'], 'exist', 'skipOnError' => true, 'targetClass' => Provider::class, 'targetAttribute' => ['idprovider' => 'id']],
             [['idreq'], 'exist', 'skipOnError' => true, 'targetClass' => Req::class, 'targetAttribute' => ['idreq' => 'id']],
@@ -62,15 +64,16 @@ class Ocomp extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'noc' => 'NOC',
-            'idtop' => 'Idtop',
-            'idvop' => 'Idvop',
+            'idtop' => 'Tipo de Pago',
+            'idvop' => 'Impuesto',
             'idreq' => 'Requerimiento',
-            'iduser' => 'Iduser',
-            'idprovider' => 'Idprovider',
+            'iduser' => 'Usuario',
+            'idprovider' => 'Proveedor',
+            'noc' => 'NOC',
+            'descrip' => 'Descripción',
             'subtotal' => 'Subtotal',
             'neto' => 'Neto',
-            'iva' => 'Iva',
+            'iva' => 'Impuesto',
             'total' => 'Total',
             'created_at' => 'Creado',
             'updated_at' => 'Actualizado',
@@ -80,9 +83,9 @@ class Ocomp extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idprovider0]].
      *
-     * @return \yii\db\ActiveQuery|ProviderQuery
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
      */
-    public function getProvider()
+    public function getIdprovider0()
     {
         return $this->hasOne(Provider::class, ['id' => 'idprovider']);
     }
@@ -92,7 +95,7 @@ class Ocomp extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|ReqQuery
      */
-    public function getReq()
+    public function getIdreq0()
     {
         return $this->hasOne(Req::class, ['id' => 'idreq']);
     }
@@ -100,9 +103,9 @@ class Ocomp extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idtop0]].
      *
-     * @return \yii\db\ActiveQuery|TopQuery
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
      */
-    public function getTop()
+    public function getIdtop0()
     {
         return $this->hasOne(Top::class, ['id' => 'idtop']);
     }
@@ -112,7 +115,7 @@ class Ocomp extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|UserQuery
      */
-    public function getUser()
+    public function getIduser0()
     {
         return $this->hasOne(User::class, ['id' => 'iduser']);
     }
@@ -120,19 +123,19 @@ class Ocomp extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idvop0]].
      *
-     * @return \yii\db\ActiveQuery|VopQuery
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
      */
-    public function getVop()
+    public function getIdvop0()
     {
         return $this->hasOne(Vop::class, ['id' => 'idvop']);
     }
 
     /**
      * {@inheritdoc}
-     * @return OcompQuery the active query used by this AR class.
+     * @return PocQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new OcompQuery(get_called_class());
+        return new PocQuery(get_called_class());
     }
 }

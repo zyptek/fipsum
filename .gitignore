@@ -36,7 +36,7 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
-# ignore generated files
+# ignore MY generated files
 /frontend/web/index-test.php
 /frontend/web/robots.txt
 /frontend/web/assets/*
@@ -50,3 +50,16 @@ phpunit.phar
 /backend/web/uploads/*
 /pxma
 /backend/web/pxma
+assets/*
+!assets/.gitignore
+protected/runtime/*
+!protected/runtime/.gitignore
+protected/data/*.db
+themes/classic/views/
+/py-api
+/node-api
+composr.lock
+tests
+test*
+codeception
+codeception.yml

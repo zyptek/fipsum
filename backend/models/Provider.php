@@ -65,15 +65,15 @@ class Provider extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'altname' => 'Altname',
+            'altname' => 'Nombre de Fantasia',
             'rut' => 'Rut',
             'giro' => 'Giro',
             'idregion' => 'Idregion',
-            'city' => 'City',
+            'city' => 'Ciudad',
             'idcity' => 'Idcity',
-            'address' => 'Address',
-            'contact' => 'Contact',
-            'phone' => 'Phone',
+            'address' => 'Dirección',
+            'contact' => 'Contacto',
+            'phone' => 'Telefono',
             'email' => 'Email',
             'active' => 'Active',
             'created_at' => 'Created At',
@@ -85,7 +85,7 @@ class Provider extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idcity0]].
      *
-     * @return \yii\db\ActiveQuery|CityQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getIdcity0()
     {
@@ -95,7 +95,7 @@ class Provider extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idregion0]].
      *
-     * @return \yii\db\ActiveQuery|RegionQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getIdregion0()
     {
@@ -105,7 +105,7 @@ class Provider extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Ocomps]].
      *
-     * @return \yii\db\ActiveQuery|OcompQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getOcomps()
     {
@@ -115,19 +115,10 @@ class Provider extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Pquotes]].
      *
-     * @return \yii\db\ActiveQuery|PquoteQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getPquotes()
     {
         return $this->hasMany(Pquote::class, ['idprovider' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return ProviderQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new ProviderQuery(get_called_class());
     }
 }

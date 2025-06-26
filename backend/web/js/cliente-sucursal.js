@@ -1,8 +1,10 @@
 $(document).ready(function() {
     $('#select-company').change(function() {
         var companyId = $(this).val();
-        var $branchSelect = $('#select-branch');
-        var $solicitorSelect = $('#select-solicitor');
+//        var $branchSelect = $('#select-branch');
+//        var $solicitorSelect = $('#select-solicitor');
+        var $branchSelect = $('#req-idbranch');
+        var $solicitorSelect = $('#req-idsolicitor');
         
         // limpiar campos
         $branchSelect.html('<option value="">Seleccione...</option>');

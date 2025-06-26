@@ -4,12 +4,12 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Ocomp;
+use backend\models\Poc;
 
 /**
- * OcompSearch represents the model behind the search form of `backend\models\Ocomp`.
+ * PocSearch represents the model behind the search form of `backend\models\Poc`.
  */
-class OcompSearch extends Ocomp
+class PocSearch extends Poc
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class OcompSearch extends Ocomp
     public function rules()
     {
         return [
-            [['id', 'noc', 'idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'subtotal', 'neto', 'iva', 'total'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['id', 'idtop', 'idvop', 'idreq', 'iduser', 'idprovider', 'noc', 'subtotal', 'neto', 'iva', 'total'], 'integer'],
+            [['descrip', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class OcompSearch extends Ocomp
      */
     public function search($params)
     {
-        $query = Ocomp::find();
+        $query = Poc::find();
 
         // add conditions that should always apply here
 
@@ -59,12 +59,12 @@ class OcompSearch extends Ocomp
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'noc' => $this->noc,
             'idtop' => $this->idtop,
             'idvop' => $this->idvop,
             'idreq' => $this->idreq,
             'iduser' => $this->iduser,
             'idprovider' => $this->idprovider,
+            'noc' => $this->noc,
             'subtotal' => $this->subtotal,
             'neto' => $this->neto,
             'iva' => $this->iva,
@@ -72,6 +72,8 @@ class OcompSearch extends Ocomp
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        $query->andFilterWhere(['like', 'descrip', $this->descrip]);
 
         return $dataProvider;
     }

@@ -67,13 +67,13 @@ class Squote extends \yii\db\ActiveRecord
             'neto' => 'Neto',
             'iva' => 'Iva',
             'total' => 'Total',
-            'created_at' => 'Created At',
+            'created_at' => 'Creado',
             'accepted' => 'Accepted',
             'author_accepted' => 'Author Accepted',
             'date_accepted' => 'Date Accepted',
             'approved_f' => 'Approved F',
             'approved_c' => 'Approved C',
-            'idreq' => 'Idreq',
+            'idreq' => 'Requerimiento',
             'idpquote' => 'Idpquote',
         ];
     }

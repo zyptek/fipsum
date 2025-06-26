@@ -30,8 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
 #            ['class' => 'yii\grid\SerialColumn'],
 #           'id',
-            'name',
             'alias',
+            'name',
+            'branches',            
             [
             	'attribute' => 'idregion',
             	'value' => function ($model) {
@@ -39,8 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 	return ucwords($result);
             	},
             ],
-            'branches',
-            //'active',
+
+            'active',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Company $model, $key, $index, $column) {

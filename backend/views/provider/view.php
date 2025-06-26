@@ -30,8 +30,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'name',
+            'altname',
+            'rut',
+            'giro',                                    
+#            'idregion',
+            'address',
+            'city',
+            'contact',
+            'phone',            
+            'email:email',
             [
-                'label' => 'Regiones',
+                'label' => 'Regiones (Cobertura)',
                 'format' => 'raw',
                 'value' => function ($model) use ($selectedList, $regionList) {
 
@@ -55,11 +64,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $html;
                 },
             ],
-#            'idregion',
-            'city',
-            'address',
-            'contact',
-            'email:email',
             [
             	'attribute' => 'created_at',
             	'value' => function($model){

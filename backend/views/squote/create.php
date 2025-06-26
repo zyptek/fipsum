@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var backend\models\Squote $model */
 
-$this->title = 'Ingresar Squote';
-$this->params['breadcrumbs'][] = ['label' => 'Squotes', 'url' => ['index']];
+$this->title = 'Ingresar Presupuesto';
+$this->params['breadcrumbs'][] = ['label' => 'Presupuestos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="squote-create">

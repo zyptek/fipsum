@@ -77,7 +77,7 @@ class Req extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'Nº IT',
+            'id' => 'Nº Req',
             'nst' => 'Nº ST',
             'nceco' => 'CECO',
             'inidetail' => 'Detalle',
@@ -93,6 +93,16 @@ class Req extends \yii\db\ActiveRecord
             'tecasigned' => 'Técnico Asignado',
             'created_at' => 'Creado',
             'updated_at' => 'Actualizado',
+            'companyBranch' => 'Cliente',
+			'statusCol' => 'Status',
+			'kamCol' => 'Admin Cta',
+			'tosCol' => 'Tipo de Venta',
+			'activityCol' => 'Actividad',
+			'solicitorCol' => 'Solicitante',
+			'estdaysCol' => 'Tiempo Estimado (Dias)',
+			'createdCol' => 'Fecha Ingreso',
+			'timeCol' => 'Tiempo',
+			'cotiCol' => 'Coti.',
         ];
     }
 

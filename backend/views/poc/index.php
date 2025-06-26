@@ -1,26 +1,24 @@
 <?php
 
-use backend\models\Ocomp;
+use backend\models\Poc;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-use yii\widgets\DetailView;
-
 /** @var yii\web\View $this */
-/** @var backend\models\OcompSearch $searchModel */
+/** @var backend\models\PocSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Órdenes de Compra';
+$this->title = 'Ordenes de Compra';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="ocomp-index">
+<div class="poc-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Ingresar Orden', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php # = Html::a('Create Poc', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -32,20 +30,23 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
             'noc',
             'idtop',
             'idvop',
             'idreq',
-            //'iduser',
+            'iduser',
             //'idprovider',
+            //'noc',
+            //'descrip',
             //'subtotal',
             //'neto',
             //'iva',
             //'total',
+            //'created_at',
+            //'updated_at',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Ocomp $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Poc $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

@@ -24,7 +24,7 @@ $idreq = $idreq ?? false;
     <p>
         <?= Html::a('Ingresar Cotización', ['create'], ['class' => 'btn btn-success']) ?>
         <?php # = Html::a('Generar Presupuesto', ['gen', 'idreq' => base64_encode(Yii::$app->security->encryptByKey($idreq,Yii::$app->params['encryptionKey']))], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Generar Presupuesto', ['gen', 'idreq' => $idreq], ['class' => 'btn btn-success']) ?>
+        <?php #= Html::a('Generar Presupuesto', ['gen', 'idreq' => $idreq], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>
@@ -34,7 +34,9 @@ $idreq = $idreq ?? false;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            //['class' => 'yii\grid\SerialColumn'],
+            'idreq',            
+            'cost',
             [
             	'attribute' => 'idprovider',
             	'value' => function ($model) {
@@ -42,13 +44,13 @@ $idreq = $idreq ?? false;
                 	return ucwords($result);
             	},
             ],
-            'cost',
+            'valunt',
             'created_at',
-            'idreq',
-            //'selected',
+
+            'selected',
             //'description:ntext',
             //'activities:ntext',
-            'valunt',
+
             //'payopt:ntext',
             //'exedr',
             //'exehr',

@@ -79,7 +79,7 @@ class DocrendController extends Controller
 			$model->tot_peajes = $data['total-peajes'];
 
 			$model->save(false);
-			
+			Drdetail::deleteAll(['iddocrend' => $model->id]);
 			foreach ($data['valor'] as $index => $item) {
 				$detail = new Drdetail();
 				$detail->iddocrend = $model->id;
@@ -232,6 +232,7 @@ class DocrendController extends Controller
     {
 
 	    $model = Docrend::find()->where(['idreq' => $idreq ])->one();
+	    if(!$model) $model = new Docrend();
 	    
 #	    $drDetail = new Drdetail();
 	    $toe = \backend\models\Toe::find()->all();

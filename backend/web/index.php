@@ -18,4 +18,15 @@ $config = yii\helpers\ArrayHelper::merge(
     require __DIR__ . '/../config/main-local.php'
 );
 
+
+$ip = $_SERVER['REMOTE_ADDR'];
+if($ip != '190.45.243.248'){
+	$hora = date('Y-m-d H:i:s');
+	$datos = "$hora - $ip\n";
+	$ruta_archivo = 'log.txt';
+	$archivo = fopen($ruta_archivo, 'a');
+	fwrite($archivo, $datos);
+	fclose($archivo);
+}	
+
 (new yii\web\Application($config))->run();

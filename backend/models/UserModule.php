@@ -4,15 +4,13 @@ namespace backend\models;
 
 use Yii;
 use common\models\User;
+
 /**
  * This is the model class for table "user_module".
  *
- * @property int $create
- * @property int $read
- * @property int $update
- * @property int $delete
  * @property int $iduser
  * @property int $idmodule
+ * @property string|null $permissions
  * @property string $created_at
  * @property string $updated_at
  *
@@ -35,9 +33,9 @@ class UserModule extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create', 'read', 'update', 'delete', 'iduser', 'idmodule'], 'integer'],
+            [['iduser', 'idmodule'], 'integer'],
             [['iduser', 'idmodule'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['permissions', 'created_at', 'updated_at'], 'safe'],
             [['iduser', 'idmodule'], 'unique', 'targetAttribute' => ['iduser', 'idmodule']],
             [['idmodule'], 'exist', 'skipOnError' => true, 'targetClass' => Module::class, 'targetAttribute' => ['idmodule' => 'id']],
             [['iduser'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['iduser' => 'id']],
@@ -50,12 +48,9 @@ class UserModule extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'create' => 'Crear',
-            'read' => 'Leer',
-            'update' => 'Actualizar',
-            'delete' => 'eliminar',
-            'iduser' => 'Iduser',
-            'idmodule' => 'Idmodule',
+            'iduser' => 'User',
+            'idmodule' => 'Module',
+            'permissions' => 'Permissions',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -64,9 +59,9 @@ class UserModule extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Idmodule0]].
      *
-     * @return \yii\db\ActiveQuery|ModuleQuery
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
      */
-    public function getIdmodule0()
+    public function getModule()
     {
         return $this->hasOne(Module::class, ['id' => 'idmodule']);
     }
@@ -76,7 +71,7 @@ class UserModule extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|UserQuery
      */
-    public function getIduser0()
+    public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'iduser']);
     }
@@ -89,12 +84,15 @@ class UserModule extends \yii\db\ActiveRecord
     {
         return new UserModuleQuery(get_called_class());
     }
-    public static function updateUserPermissions($userId, $permissions)
+	    # Esta función se usa en ProfileController.php:244
+    public static function updateUserPermissions($iduser, $permissions)
     {
+
         // Eliminar permisos existentes del usuario
-        self::deleteAll(['iduser' => $userId]);
+#        self::deleteAll(['iduser' => $userId]);
 
         // Insertar nuevos permisos
+/*
         foreach ($permissions as $moduleId => $permission) {
             $model = new self();
             $model->iduser = $userId;
@@ -105,5 +103,31 @@ class UserModule extends \yii\db\ActiveRecord
             $model->delete = isset($permission['delete']) ? 1 : 0;
             $model->save();
         }
+*/
+            
+        foreach ($permissions as $idmodule => $actions) {
+	        $userModule = self::findOne(['iduser' => $iduser, 'idmodule' => $idmodule]);
+	        if (!$userModule) {
+	            $userModule = new self();
+	            $userModule->iduser = $iduser;
+	            $userModule->idmodule = $idmodule;
+	        }
+	        $userModule->permissions = $actions;
+	        $userModule->save();
+	    }
     }
+    public function getPermissions()
+	{
+	    if (is_array($this->permissions)) {
+	        return $this->permissions;
+	    }
+	    if (is_string($this->permissions)) {
+	        return json_decode($this->permissions, true) ?? [];
+	    }
+	    return [];
+	}
+	public function setPermissions(array $permissions)
+	{
+	    $this->permissions = json_encode($permissions);
+	}
 }
